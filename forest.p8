@@ -59,6 +59,9 @@ function _init()
  
  shadow_offset=v_mul(shadow_offset,0.2)
  
+ perspective_offset={64,80}
+ height_mult=0.015
+ 
  cells={}
  cells.w=64
  cells.h=64
@@ -67,48 +70,37 @@ function _init()
  
  
  trees={}
- trees.height_range={4,12}
+ trees.height_range={10,25}
  trees.girth_range={5,10}
  trees.gap=32
  
  clouds={}
- clouds.height_range={15,20}
+ clouds.a={}
+ clouds.height_range={32,64}
  clouds.count_range={20,40}
  clouds.radius_range={5,15}
  clouds.cluster_range={5,7}
  clouds.w=256
  clouds.h=256
  
- for i=1,range(clouds.count_range) do
-  local x=rnd(clouds.w)-rnd(clouds.w)
-  local y=rnd(clouds.h)-rnd(clouds.h)
-  local r=0
-  for j=1,range(clouds.cluster_range) do
-   local c={}
-   c.r=range(clouds.radius_range)
-   c.p={
-    x+range({1,(c.r+r)/2})-range({1,(c.r+r)/2}),
-    y+range({1,(c.r+r)/2})-range({1,(c.r+r)/2})
-   }
-   if rnd() > 0.5 then
-    x=c.p[1]
-    y=c.p[2]
-    r=c.r
-   end
-   c.height=range(clouds.height_range)
-  
-   
-   add(clouds,c)
-  end
- end
  
+ bushes={}
+ bushes.a={}
+ bushes.height_range={0.5,1.5}
+ bushes.count_range={10,30}
+ bushes.radius_range={1,2.5}
+ bushes.cluster_range={2,4}
+ bushes.bloom_freq=0.25
+ bushes.bloom_colours={9,10,12,2}
+ bushes.w=300
+ bushes.h=300
  
  --player
  p={}
  p.p={0,0}
  p.v={0,0}
- p.speed={1,1}
- p.max_speed=5
+ p.speed={0.7,0.7}
+ p.max_speed=3
  p.cur_speed=0
  p.damping=0.8
  p.a=0
@@ -123,6 +115,8 @@ function _init()
  cam={}
  cam.p=v_sub(p.p,{64,64})
  cam.p_o=cam.p
+ cam.offset={64,64}
+ cam.sway={0.25,0.25,8,9}
  
  cells.current={
   flr(cam.p[1]/cells.w),
@@ -142,6 +136,71 @@ function _init()
  for i=3,footprints.max-1,2 do
   footprints[i]=footprints[1]
   footprints[i+1]=footprints[2]
+ end
+ 
+ 
+ 
+ 
+ -- clouds init
+ for i=1,range(clouds.count_range) do
+  local x=rnd(clouds.w)-rnd(clouds.w)
+  local y=rnd(clouds.h)-rnd(clouds.h)
+  local r=0
+  for j=1,range(clouds.cluster_range) do
+   local c={}
+   c.r=range(clouds.radius_range)
+   c.p={
+    x+range({1,(c.r+r)/2})-range({1,(c.r+r)/2}),
+    y+range({1,(c.r+r)/2})-range({1,(c.r+r)/2})
+   }
+   if rnd() > 0.5 then
+    x=c.p[1]
+    y=c.p[2]
+    r=c.r
+   end
+   c.height=range(clouds.height_range)
+  
+   
+   add(clouds.a,c)
+  end
+ end
+ 
+ -- bushes init
+ for i=1,range(bushes.count_range) do
+  local x=rnd(bushes.w)-rnd(bushes.w)
+  local y=rnd(bushes.h)-rnd(bushes.h)
+  local r=0
+  local c=bushes.bloom_colours[flr(rnd(#bushes.bloom_colours))%#bushes.bloom_colours+1]
+  for j=1,range(bushes.cluster_range) do
+   local b={}
+   b.r=range(bushes.radius_range)
+   b.p={
+    x+range({1,(b.r+r)})-range({1,(b.r+r)/2}),
+    y+range({1,(b.r+r)})-range({1,(b.r+r)/2})
+   }
+   if rnd() > 0.5 then
+    x=b.p[1]
+    y=b.p[2]
+    r=b.r
+   end
+   b.height=range(bushes.height_range)
+   b.c=c
+   
+   if rnd() > bushes.bloom_freq then
+    local bloom={}
+    local a=rnd()
+    local r=rnd(b.r/2)+b.r/4
+    bloom.p={
+     r*cos(a),
+     r*sin(a)
+    }
+    b.bloom = bloom
+   else
+    b.bloom=nil
+   end
+   
+   add(bushes.a,b)
+  end
  end
 end
 
@@ -213,8 +272,17 @@ function _update()
  p.p=v_add(p.p,p.v)
  
  -- camera
+ cam.offset=v_add(v_mul(p.v,-15),{64,64})
+ 
  cam.p_o=cam.p
- cam.p=v_lerp(cam.p,v_sub(p.p,{64,64}),0.1)
+ local sway={
+  cam.sway[1]*cos(time()/cam.sway[3]),
+  cam.sway[2]*sin(time()/cam.sway[4])
+ } 
+ cam.p=v_add(
+ v_lerp(cam.p,v_sub(p.p,cam.offset),0.1),
+ sway
+ )
  cam.v=v_sub(cam.p,cam.p_o)
 
  local cell={
@@ -229,6 +297,7 @@ function _update()
  
  update_trees()
  update_clouds()
+ update_bushes()
  
  
  -- footprints
@@ -274,10 +343,8 @@ function update_trees()
  local y = cam.p[2]%cells.h-b*cells.h
  
  for t in all(ts.a) do
-  t.s=v_sub(t.p,{x+64,y+64})
-  t.s[1]/=trees.gap
-  t.s[2]/=trees.gap
-  t.s=v_mul(t.s,t.height)
+  t.s=v_sub(t.p,v_add({x,y},perspective_offset))
+  t.s=v_mul(t.s,t.height*height_mult)
   --local r=abs(s[1])+abs(s[2])/(trees.gap*)
   
   t.s=v_add(t.p,t.s)
@@ -292,7 +359,7 @@ function update_trees()
 end
 
 function update_clouds()
- for c in all(clouds) do
+ for c in all(clouds.a) do
   c.p[1]+=0.1-cam.v[1]
   c.p[2]+=0.1-cam.v[2]
   
@@ -307,9 +374,32 @@ function update_clouds()
    c.p[2] += clouds.h*2+clouds.radius_range[2]
   end
   
-  c.s=v_sub(c.p,{64,64})
+  c.s=v_sub(c.p,perspective_offset)
+  c.s=v_mul(c.s,c.height*height_mult)
   c.s=v_add(c.p,c.s)
+ end
+end
+
+function update_bushes()
+ for b in all(bushes.a) do
+  b.p[1]-=cam.v[1]
+  b.p[2]-=cam.v[2]
   
+  if b.p[1] > bushes.w+bushes.radius_range[2] then
+   b.p[1] -= bushes.w*2+bushes.radius_range[2]
+  elseif b.p[1] < -bushes.w-bushes.radius_range[2] then
+   b.p[1] += bushes.w*2+bushes.radius_range[2]
+  end
+  if b.p[2] > bushes.h+bushes.radius_range[2] then
+   b.p[2] -= bushes.h*2+bushes.radius_range[2]
+  elseif b.p[2] < -bushes.h-bushes.radius_range[2] then
+   b.p[2] += bushes.h*2+bushes.radius_range[2]
+  end
+  
+  b.s=v_sub(b.p,perspective_offset)
+  b.s=v_mul(b.s,b.height*height_mult)
+  b.s=v_add(b.p,b.s)
+    
  end
 end
 
@@ -320,15 +410,14 @@ function _draw()
  
  camera(cam.p[1],cam.p[2])
  
- 
- 
- 
  draw_footprints()
  
+ draw_bushes(true)
  draw_player(true)
  draw_trees(true)
  draw_clouds(true)
  
+ draw_bushes(false)
  draw_player(false)
  draw_trees(false)
  draw_clouds(false)
@@ -355,18 +444,24 @@ end
 function draw_player(shadow)
  camera(cam.p[1],cam.p[2])
  if shadow then
-  circfill(p.p[1]+shadow_offset[1]*p.height,p.p[2]+shadow_offset[2]*p.height,4,5)
+  circfill(
+  p.p[1]+shadow_offset[1]*p.height,
+  p.p[2]+shadow_offset[2]*p.height,
+  4,5)
  else
   local s=p.cur_speed/p.max_speed
   local pp={
    p.p[1]+4*cos(p.a)*s,
    p.p[2]+4*sin(p.a)*s
   }
-  circfill(pp[1],pp[2],2,7)
-  line(p.p[1],p.p[2],
-  p.p[1]+2*cos(p.a),
-  p.p[2]+2*sin(p.a))
- end
+  
+  circfill(p.p[1],p.p[2],3,2)
+  circfill(pp[1],pp[2],2,4)
+  pp=v_lerp(p.p,pp,0.75)
+  circfill(pp[1],pp[2],2,13)
+  pp=v_lerp(p.p,pp,0.5)
+  pset(pp[1],pp[2],2)
+  end
 end
 
 function draw_trees(shadows)
@@ -441,18 +536,46 @@ end
 function draw_clouds(shadows)
  camera(0,0)
  if shadows then
- color(5)
- for c in all(clouds) do
-  circfill(
-  c.p[1]+shadow_offset[1]*c.height,
-  c.p[2]+shadow_offset[2]*c.height,
-  c.r)
- end
+  color(5)
+  for c in all(clouds.a) do
+   circfill(
+   c.p[1]+shadow_offset[1]*c.height,
+   c.p[2]+shadow_offset[2]*c.height,
+   c.r)
+  end
  else
- color(7)
- for c in all(clouds) do
-  circfill(c.s[1],c.s[2],c.r)
+  color(7)
+  for c in all(clouds.a) do
+   circfill(c.s[1],c.s[2],c.r)
+  end
  end
+end
+ 
+function draw_bushes(shadows)
+ camera(0,0)
+ if shadows then
+  color(5)
+  for b in all(bushes.a) do
+   circfill(
+   b.p[1]+shadow_offset[1]*b.height,
+   b.p[2]+shadow_offset[2]*b.height,
+   b.r)
+  end
+ else
+  color(3)
+  for b in all(bushes.a) do
+   circfill(b.s[1],b.s[2],b.r)
+  end
+  for b in all(bushes.a) do
+   if b.bloom!=nil then
+    local p=v_add(b.s,b.bloom.p)
+    pset(p[1],p[2],b.c)
+   end
+  end
+  --[[color(8)
+  for b in all(bushes.a) do
+   
+  end]]
  end
 end
 
