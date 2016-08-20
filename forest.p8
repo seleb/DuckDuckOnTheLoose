@@ -4,6 +4,10 @@ __lua__
 
 
 --math
+function range(v)
+ return rnd(max(0,v[2]-v[1]))+v[1]
+end
+
 function lerp(_from,_to,_t)
  return _from+_t*(_to-_from)
 end
@@ -51,6 +55,54 @@ function v_dist(_a,_b)
 end
 
 function _init()
+ shadow_offset=v_normalize({2,3})
+ 
+ shadow_offset=v_mul(shadow_offset,0.2)
+ 
+ cells={}
+ cells.w=64
+ cells.h=64
+ cells.fill_x=flr(128/cells.w+0.5)
+ cells.fill_y=flr(128/cells.h+0.5)
+ 
+ 
+ trees={}
+ trees.height_range={4,12}
+ trees.girth_range={5,10}
+ trees.gap=32
+ 
+ clouds={}
+ clouds.height_range={15,20}
+ clouds.count_range={20,40}
+ clouds.radius_range={5,15}
+ clouds.cluster_range={5,7}
+ clouds.w=256
+ clouds.h=256
+ 
+ for i=1,range(clouds.count_range) do
+  local x=rnd(clouds.w)-rnd(clouds.w)
+  local y=rnd(clouds.h)-rnd(clouds.h)
+  local r=0
+  for j=1,range(clouds.cluster_range) do
+   local c={}
+   c.r=range(clouds.radius_range)
+   c.p={
+    x+range({1,(c.r+r)/2})-range({1,(c.r+r)/2}),
+    y+range({1,(c.r+r)/2})-range({1,(c.r+r)/2})
+   }
+   if rnd() > 0.5 then
+    x=c.p[1]
+    y=c.p[2]
+    r=c.r
+   end
+   c.height=range(clouds.height_range)
+  
+   
+   add(clouds,c)
+  end
+ end
+ 
+ 
  --player
  p={}
  p.p={0,0}
@@ -64,29 +116,21 @@ function _init()
  p.stride_w=4
  p.stride_l=8
  p.stride_alt=false
+ p.height=2
  
  
  -- camera
  cam={}
  cam.p=v_sub(p.p,{64,64})
+ cam.p_o=cam.p
+ 
+ cells.current={
+  flr(cam.p[1]/cells.w),
+  flr(cam.p[2]/cells.h)
+ }
+ init_cells()
  
  
- trees={}
- trees.a={}
- trees.gap=32
- for x=0,128,trees.gap do
- for y=0,128,trees.gap do
-  local t={}
-  t.p={
-   x+rnd(trees.gap),
-   y+rnd(trees.gap)
-  }
-  t.leaves={}
-  t.height=rnd(10)+5
-  t.girth=rnd(5)+5
-  add(trees.a,t)
- end
- end
  
  footprints={
   {p.p[1],p.p[2]+p.stride_w},
@@ -98,6 +142,43 @@ function _init()
  for i=3,footprints.max-1,2 do
   footprints[i]=footprints[1]
   footprints[i+1]=footprints[2]
+ end
+end
+
+function init_cells()
+ cells.a={}
+ for a=0,cells.fill_x do
+ cells.a[a]={}
+ for b=0,cells.fill_y do
+ local c={}
+ cells.a[a][b]=c
+ 
+ srand(a+b+cells.current[1]+cells.current[2])
+ 
+ c.trees={}
+ 
+ c.trees.a={}
+ c.trees.freq=rnd()
+ for x=0,cells.w-trees.gap,trees.gap do
+ for y=0,cells.h-trees.gap,trees.gap do
+  if rnd() < c.trees.freq then
+   local t={}
+   t.height=range(trees.height_range)
+   t.girth=range(trees.girth_range)
+   t.p={
+    x+rnd(trees.gap),
+    y+rnd(trees.gap)
+   }
+   t.p[1]=mid(t.girth,t.p[1],cells.w-t.girth)
+   t.p[2]=mid(t.girth,t.p[2],cells.h-t.girth)
+   
+   t.leaves={}
+   add(c.trees.a,t)
+  end
+ end
+ end
+ 
+ end
  end
 end
 
@@ -132,9 +213,22 @@ function _update()
  p.p=v_add(p.p,p.v)
  
  -- camera
+ cam.p_o=cam.p
  cam.p=v_lerp(cam.p,v_sub(p.p,{64,64}),0.1)
+ cam.v=v_sub(cam.p,cam.p_o)
 
+ local cell={
+ flr(cam.p[1]/cells.w),
+ flr(cam.p[2]/cells.h)
+ }
+ if cell!=cells.current then
+  cells.current=cell
+  init_cells()
+ end
+ 
+ 
  update_trees()
+ update_clouds()
  
  
  -- footprints
@@ -170,8 +264,17 @@ end
 
 
 function update_trees()
- for t in all(trees.a) do
-  t.s=v_sub(t.p,v_add(cam.p,{64,64}))
+
+ for a=0,cells.fill_x do
+ for b=0,cells.fill_y do
+ 
+ local ts=cells.a[a][b].trees
+ 
+ local x = cam.p[1]%cells.w-a*cells.w
+ local y = cam.p[2]%cells.h-b*cells.h
+ 
+ for t in all(ts.a) do
+  t.s=v_sub(t.p,{x+64,y+64})
   t.s[1]/=trees.gap
   t.s[2]/=trees.gap
   t.s=v_mul(t.s,t.height)
@@ -183,8 +286,32 @@ function update_trees()
   t.leaves[2]=v_lerp(t.p,t.s,0.75)
   t.leaves[3]=t.s
  end
+ 
+ end
+ end
 end
 
+function update_clouds()
+ for c in all(clouds) do
+  c.p[1]+=0.1-cam.v[1]
+  c.p[2]+=0.1-cam.v[2]
+  
+  if c.p[1] > clouds.w+clouds.radius_range[2] then
+   c.p[1] -= clouds.w*2+clouds.radius_range[2]
+  elseif c.p[1] < -clouds.w-clouds.radius_range[2] then
+   c.p[1] += clouds.w*2+clouds.radius_range[2]
+  end
+  if c.p[2] > clouds.h+clouds.radius_range[2] then
+   c.p[2] -= clouds.h*2+clouds.radius_range[2]
+  elseif c.p[2] < -clouds.h-clouds.radius_range[2] then
+   c.p[2] += clouds.h*2+clouds.radius_range[2]
+  end
+  
+  c.s=v_sub(c.p,{64,64})
+  c.s=v_add(c.p,c.s)
+  
+ end
+end
 
 function _draw()
  camera(0,0)
@@ -197,11 +324,16 @@ function _draw()
  
  
  draw_footprints()
- draw_player()
  
- draw_trees()
+ draw_player(true)
+ draw_trees(true)
+ draw_clouds(true)
  
- draw_debug()
+ draw_player(false)
+ draw_trees(false)
+ draw_clouds(false)
+ 
+ --draw_debug()
 end
 
 function draw_footprints()
@@ -220,25 +352,42 @@ function draw_footprints()
  end
 end
 
-function draw_player()
- local s=p.cur_speed/p.max_speed
- local pp={
-  p.p[1]+4*cos(p.a)*s,
-  p.p[2]+4*sin(p.a)*s
- }
- circfill(p.p[1],p.p[2],4,5)
- circfill(pp[1],pp[2],2,7)
- line(p.p[1],p.p[2],
- p.p[1]+2*cos(p.a),
- p.p[2]+2*sin(p.a))
+function draw_player(shadow)
+ camera(cam.p[1],cam.p[2])
+ if shadow then
+  circfill(p.p[1]+shadow_offset[1]*p.height,p.p[2]+shadow_offset[2]*p.height,4,5)
+ else
+  local s=p.cur_speed/p.max_speed
+  local pp={
+   p.p[1]+4*cos(p.a)*s,
+   p.p[2]+4*sin(p.a)*s
+  }
+  circfill(pp[1],pp[2],2,7)
+  line(p.p[1],p.p[2],
+  p.p[1]+2*cos(p.a),
+  p.p[2]+2*sin(p.a))
+ end
 end
 
-function draw_trees()
+function draw_trees(shadows)
+ for a=0,cells.fill_x do
+ for b=0,cells.fill_y do
+ local trees=cells.a[a][b].trees
+ camera(
+ cam.p[1]%cells.w-a*cells.w,
+ cam.p[2]%cells.h-b*cells.h
+ )
+ 
+ if shadows then
  -- shadows
  color(5)
  for t in all(trees.a) do
-  circfill(t.p[1],t.p[2],t.girth)
+  circfill(
+  t.p[1]+shadow_offset[1]*t.height/2,
+  t.p[2]+shadow_offset[2]*t.height/2,
+  t.girth)
  end
+ else
  -- trunks
  color(4)
  for t in all(trees.a) do
@@ -282,15 +431,59 @@ function draw_trees()
  for t in all(trees.a) do
   circfill(t.leaves[3][1],t.leaves[3][2],t.girth*0.5)  
  end
+ end
+ 
+ end
+ end
+end
+
+
+function draw_clouds(shadows)
+ camera(0,0)
+ if shadows then
+ color(5)
+ for c in all(clouds) do
+  circfill(
+  c.p[1]+shadow_offset[1]*c.height,
+  c.p[2]+shadow_offset[2]*c.height,
+  c.r)
+ end
+ else
+ color(7)
+ for c in all(clouds) do
+  circfill(c.s[1],c.s[2],c.r)
+ end
+ end
 end
 
 
 function draw_debug()
  camera(0,0)
  
- 
  print_ol("mem:"..stat(0)/1024,1,1,0,7)
  print_ol("cpu:"..stat(1),1,7,0,7)
+ print_ol("cell:"..cells.current[1].." "..cells.current[2],1,15,0,7)
+
+ --crosshair
+ circ(64,64,1,0)
+ 
+ --cells
+ camera(cam.p[1],cam.p[2])
+ for x=cells.current[1],cells.current[1]+cells.fill_x do
+ for y=cells.current[2],cells.current[2]+cells.fill_y do
+ if x==cells.current[1] and y==cells.current[2] then
+  color(8)
+ else
+  color(6)
+ end
+ rect(
+ x*cells.w+1,
+ y*cells.h+1,
+ (x+1)*cells.w-1,
+ (y+1)*cells.h-1
+ )
+ end
+ end
 end
 
 function print_ol(_s,_x,_y,_c1,_c2)
