@@ -56,7 +56,14 @@ function _init()
  p.p={0,0}
  p.v={0,0}
  p.speed={1,1}
+ p.max_speed=5
+ p.cur_speed=0
+ p.damping=0.8
  p.a=0
+ p.a_o=0
+ p.stride_w=4
+ p.stride_l=8
+ p.stride_alt=false
  
  
  -- camera
@@ -81,37 +88,45 @@ function _init()
  end
  end
  
- footprints={{p.p[1],p.p[2]}}
+ footprints={
+  {p.p[1],p.p[2]+p.stride_w},
+  {p.p[1],p.p[2]-p.stride_w}
+ }
+ footprints.max=64
+ footprints.remove_delay=0.25
+ footprints.remove_last=time()
+ for i=3,footprints.max-1,2 do
+  footprints[i]=footprints[1]
+  footprints[i+1]=footprints[2]
+ end
 end
 
 function _update()
  local v_dif={0,0}
- if btn(0) then
-  v_dif[1] -= p.speed[1]
- end
- if btn(1) then
-  v_dif[1] += p.speed[1]
- end
- if btn(2) then
-  v_dif[2] -= p.speed[1]
- end
- if btn(3) then
-  v_dif[2] += p.speed[1]
- end
- 
+ if btn(0) then v_dif[1] -= p.speed[1] end
+ if btn(1) then v_dif[1] += p.speed[1] end
+ if btn(2) then v_dif[2] -= p.speed[2] end
+ if btn(3) then v_dif[2] += p.speed[2] end
  
  if abs(v_dif[1])+abs(v_dif[2]) > 0.01 then
-  p.a=atan2(v_dif[1],v_dif[2])
   p.v=v_add(p.v,v_dif)
+  p.a_o=p.a
+  p.a=atan2(p.v[1],p.v[2])
  end
  
- p.v=v_mul(p.v,0.8)
+ p.v=v_mul(p.v,p.damping)
  
  if abs(p.v[1]) < 0.01 then
   p.v[1]=0
  end
  if abs(p.v[2]) < 0.01 then
   p.v[2]=0
+ end
+ 
+ p.cur_speed=v_len(p.v)
+ if p.cur_speed > p.max_speed then
+  p.v=v_mul(p.v,p.max_speed/p.cur_speed)
+  p.cur_speed=p.max_speed
  end
  
  p.p=v_add(p.p,p.v)
@@ -121,9 +136,35 @@ function _update()
 
  update_trees()
  
- if v_dist(p.p,footprints[#footprints]) > 5 then
-  local f={p.p[1],p.p[2]}
-  add(footprints,f)
+ 
+ -- footprints
+ local fa=p.a
+ if p.stride_alt then
+  fa+=0.5
+ end
+ local fw=p.stride_w*(1-p.cur_speed/p.max_speed*0.8)*(1-abs(p.a-p.a_o))
+ local fl=p.stride_l*(0.5+p.cur_speed/p.max_speed*0.5)
+ local fp={
+  p.p[1]+fw*cos(fa+0.25),
+  p.p[2]+fw*sin(fa+0.25)
+ }
+ 
+ if v_dist(fp,footprints[#footprints-1]) > fl then
+  -- add footprints
+  -- (actually just recycle existing ones)
+  for i=1,footprints.max-1 do
+   footprints[i]=footprints[i+1]
+  end
+  footprints[footprints.max]=fp
+  p.stride_alt = not p.stride_alt
+ elseif time() > footprints.remove_last+footprints.remove_delay then
+  -- remove footprints by delay
+  for i=1,footprints.max-3,2 do
+   footprints[i]=footprints[i+2]
+   footprints[i+1]=footprints[i+3]
+  end
+  
+  footprints.remove_last=time()
  end
 end
 
@@ -151,19 +192,45 @@ function _draw()
  rectfill(0,0,127,127)
  
  camera(cam.p[1],cam.p[2])
- circ(p.p[1],p.p[2],4,0)
- line(p.p[1],p.p[2],
- p.p[1]+4*cos(p.a),
- p.p[2]+4*sin(p.a))
  
- color(5)
- for f in all(footprints) do
-  circfill(f[1],f[2],1)
- end
+ 
+ 
+ 
+ draw_footprints()
+ draw_player()
  
  draw_trees()
  
  draw_debug()
+end
+
+function draw_footprints()
+ color(5)
+ for f=4,#footprints,2 do
+  local f3=footprints[f-1]
+  local f4=footprints[f]
+  local f1=v_lerp(f3,footprints[f-3],0.25)
+  local f2=v_lerp(f4,footprints[f-2],0.25)
+  
+  line(f1[1],f1[2],f3[1],f3[2])
+  line(f2[1],f2[2],f4[1],f4[2])
+  
+  circfill(f3[1],f3[2],1)
+  circfill(f4[1],f4[2],1)
+ end
+end
+
+function draw_player()
+ local s=p.cur_speed/p.max_speed
+ local pp={
+  p.p[1]+4*cos(p.a)*s,
+  p.p[2]+4*sin(p.a)*s
+ }
+ circfill(p.p[1],p.p[2],4,5)
+ circfill(pp[1],pp[2],2,7)
+ line(p.p[1],p.p[2],
+ p.p[1]+2*cos(p.a),
+ p.p[2]+2*sin(p.a))
 end
 
 function draw_trees()
