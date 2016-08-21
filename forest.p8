@@ -370,7 +370,7 @@ function update_collision()
   local l=v_len(d)
   if l < b.r then
    b.hit=true
-   p.v=v_add(p.v,v_mul(d,0.25))
+   p.v=v_add(p.v,v_div(d,l))
   else
    b.hit=false
   end
