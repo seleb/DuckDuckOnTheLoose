@@ -666,6 +666,8 @@ function draw_debug()
   color(10)
  elseif abs(x)==cells.bounds[1] or abs(y)==cells.bounds[2] then
   color(8)
+ elseif abs(x)>cells.bounds[1] or abs(y)>cells.bounds[2] then
+  color(5)
  else
   color(6)
  end
@@ -687,6 +689,12 @@ function draw_debug()
   end
   circ(b.p[1],b.p[2],b.r)
  end
+ 
+ color(6)
+ circ(p.p[1],p.p[2],p.r)
+ line(p.p[1],p.p[2],
+ p.p[1]+p.r*cos(p.a),
+ p.p[2]+p.r*sin(p.a))
 end
 
 function print_ol(_s,_x,_y,_c1,_c2)
