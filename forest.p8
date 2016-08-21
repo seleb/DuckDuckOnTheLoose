@@ -228,58 +228,19 @@ function init_cells()
   abs(x) > cells.bounds[1] or
   abs(y) > cells.bounds[2] then
   -- blank space
- elseif abs(x)==cells.bounds[1] and abs(y)==cells.bounds[2] then
+ elseif abs(x)==cells.bounds[1] or abs(y)==cells.bounds[2] then
   -- corners
   local t={}
-   t.height=range(trees.height_range)
-   t.girth=max(cells.w,cells.h)/2
-   t.p={
-    cells.w/2,
-    cells.h/2
-   }
+  t.height=range(trees.height_range)
+  t.girth=min(cells.w,cells.h)/2
+  t.p={
+   cells.w/2,
+   cells.h/2
+  }
+  t.s=t.p
    
-   t.leaves={}
-   add(c.trees.a,t)
- elseif abs(y) == cells.bounds[2] then
-  -- up/down walls
-  for x=trees.girth_range[1]*2,cells.w-trees.girth_range[1]*2,trees.girth_range[1]*2 do
-   local t={}
-   t.height=range(trees.height_range)
-   t.girth=range(v_mul(trees.girth_range,2))
-   t.p={
-    x,
-    0
-   }
-   if sgn(y)==1 then
-    t.p[2]+=t.girth+rnd(t.girth)
-   else
-    t.p[2]+=cells.h-t.girth-rnd(t.girth)
-   end
-   
-   t.leaves={}
-   add(c.trees.a,t)
-  end
- 
- elseif abs(x) == cells.bounds[1] then
-  -- left/right walls
-  for y=trees.girth_range[1]*2,cells.h-trees.girth_range[1]*2,trees.girth_range[1]*2 do
-   local t={}
-   t.height=range(trees.height_range)
-   t.girth=range(v_mul(trees.girth_range,2))
-   t.p={
-    0,
-    y
-   }
-   if sgn(x)==1 then
-    t.p[1]+=t.girth+rnd(t.girth)
-   else
-    t.p[1]+=cells.w-t.girth-rnd(t.girth)
-   end
-   
-   t.leaves={}
-   add(c.trees.a,t)
-  end
- 
+  t.leaves={{0,0},{0,0},{0,0}}
+  add(c.trees.a,t)
  else
  -- normal trees
  for x=0,cells.w-trees.gap,trees.gap do
@@ -295,7 +256,8 @@ function init_cells()
    t.p[1]=mid(t.girth,t.p[1],cells.w-t.girth)
    t.p[2]=mid(t.girth,t.p[2],cells.h-t.girth)
    
-   t.leaves={}
+   t.s=t.p
+   t.leaves={{0,0},{0,0},{0,0}}
    add(c.trees.a,t)
   end
  end
