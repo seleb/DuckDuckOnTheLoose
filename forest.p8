@@ -67,7 +67,7 @@ function _init()
  cells.h=64
  cells.fill_x=flr(128/cells.w+0.5)
  cells.fill_y=flr(128/cells.h+0.5)
- 
+ cells.bounds={4,4}
  
  trees={}
  trees.height_range={10,25}
@@ -212,12 +212,76 @@ function init_cells()
  local c={}
  cells.a[a][b]=c
  
- srand(a+b+cells.current[1]+cells.current[2])
+ local x=a+cells.current[1]
+ local y=b+cells.current[2]
+ 
+ srand(x+y)
  
  c.trees={}
  
  c.trees.a={}
  c.trees.freq=rnd()
+ 
+ 
+ 
+ if
+  abs(x) > cells.bounds[1] or
+  abs(y) > cells.bounds[2] then
+  -- blank space
+ elseif abs(x)==cells.bounds[1] and abs(y)==cells.bounds[2] then
+  -- corners
+  local t={}
+   t.height=range(trees.height_range)
+   t.girth=max(cells.w,cells.h)/2
+   t.p={
+    cells.w/2,
+    cells.h/2
+   }
+   
+   t.leaves={}
+   add(c.trees.a,t)
+ elseif abs(y) == cells.bounds[2] then
+  -- up/down walls
+  for x=trees.girth_range[1]*2,cells.w-trees.girth_range[1]*2,trees.girth_range[1]*2 do
+   local t={}
+   t.height=range(trees.height_range)
+   t.girth=range(v_mul(trees.girth_range,2))
+   t.p={
+    x,
+    0
+   }
+   if sgn(y)==1 then
+    t.p[2]+=t.girth+rnd(t.girth)
+   else
+    t.p[2]+=cells.h-t.girth-rnd(t.girth)
+   end
+   
+   t.leaves={}
+   add(c.trees.a,t)
+  end
+ 
+ elseif abs(x) == cells.bounds[1] then
+  -- left/right walls
+  for y=trees.girth_range[1]*2,cells.h-trees.girth_range[1]*2,trees.girth_range[1]*2 do
+   local t={}
+   t.height=range(trees.height_range)
+   t.girth=range(v_mul(trees.girth_range,2))
+   t.p={
+    0,
+    y
+   }
+   if sgn(x)==1 then
+    t.p[1]+=t.girth+rnd(t.girth)
+   else
+    t.p[1]+=cells.w-t.girth-rnd(t.girth)
+   end
+   
+   t.leaves={}
+   add(c.trees.a,t)
+  end
+ 
+ else
+ -- normal trees
  for x=0,cells.w-trees.gap,trees.gap do
  for y=0,cells.h-trees.gap,trees.gap do
   if rnd() < c.trees.freq then
@@ -239,9 +303,12 @@ function init_cells()
  
  end
  end
+ 
+ end
 end
 
 function _update()
+ 
  local v_dif={0,0}
  if btn(0) then v_dif[1] -= p.speed[1] end
  if btn(1) then v_dif[1] += p.speed[1] end
@@ -299,6 +366,8 @@ function _update()
  update_clouds()
  update_bushes()
  
+ update_collision()
+ 
  
  -- footprints
  local fa=p.a
@@ -332,8 +401,38 @@ function _update()
 end
 
 
-function update_trees()
+function update_collision()
+ -- blobs
+ for b in all(blobs) do
+  local d=v_sub(p.p,b.p)
+  local l=v_len(d)
+  if l < b.r then
+   b.hit=true
+   p.v=v_add(p.v,v_mul(d,0.25))
+  else
+   b.hit=false
+  end
+ end
+ 
+ -- boundaries
+ local x=p.p[1]/cells.w
+ local y=p.p[2]/cells.h
+ if x > cells.bounds[1] then
+  p.v[1] -= (x-cells.bounds[1])*10
+ elseif x < -cells.bounds[1]+1 then
+  p.v[1] -= (x+cells.bounds[1]-1)*10
+ end
+ 
+ if y > cells.bounds[2] then
+  p.v[2] -= (y-cells.bounds[2])*10
+ elseif y < -cells.bounds[2]+1 then
+  p.v[2] -= (y+cells.bounds[2]-1)*10
+ end
+end
 
+function update_trees()
+ blobs={}
+ 
  for x=0,cells.fill_x do
  for y=0,cells.fill_y do
  
@@ -354,11 +453,12 @@ function update_trees()
   t.leaves[2]=v_lerp(t.p,t.s,0.75)
   t.leaves[3]=t.s
   
-  local d=v_sub(p.p,v_add({(cells.current[1]+x)*cells.w,(cells.current[2]+y)*cells.h},t.p))
-  local l=v_len(d)
-  if l < t.girth then
-   p.v=v_add(p.v,v_mul(d,0.25))
-  end
+  
+  local blob={}
+  blob.hit = false
+  blob.p = v_add({(cells.current[1]+x)*cells.w,(cells.current[2]+y)*cells.h},t.p)
+  blob.r = t.girth
+  add(blobs,blob)
  end
  
  end
