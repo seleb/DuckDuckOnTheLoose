@@ -334,24 +334,31 @@ end
 
 function update_trees()
 
- for a=0,cells.fill_x do
- for b=0,cells.fill_y do
+ for x=0,cells.fill_x do
+ for y=0,cells.fill_y do
  
- local ts=cells.a[a][b].trees
+ local ts=cells.a[x][y].trees
  
- local x = cam.p[1]%cells.w-a*cells.w
- local y = cam.p[2]%cells.h-b*cells.h
+ local cellp = {
+ cam.p[1]%cells.w-x*cells.w,
+ cam.p[2]%cells.h-y*cells.h
+ }
  
  for t in all(ts.a) do
-  t.s=v_sub(t.p,v_add({x,y},perspective_offset))
+  t.s=v_sub(t.p,v_add(cellp,perspective_offset))
   t.s=v_mul(t.s,t.height*height_mult)
-  --local r=abs(s[1])+abs(s[2])/(trees.gap*)
   
   t.s=v_add(t.p,t.s)
   
   t.leaves[1]=v_lerp(t.p,t.s,0.5)
   t.leaves[2]=v_lerp(t.p,t.s,0.75)
   t.leaves[3]=t.s
+  
+  local d=v_sub(p.p,v_add({(cells.current[1]+x)*cells.w,(cells.current[2]+y)*cells.h},t.p))
+  local l=v_len(d)
+  if l < t.girth then
+   p.v=v_add(p.v,v_mul(d,0.25))
+  end
  end
  
  end
