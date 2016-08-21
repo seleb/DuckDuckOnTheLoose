@@ -55,6 +55,9 @@ function v_dist(_a,_b)
 end
 
 function _init()
+ srand(10) --for testing
+ seed=rnd()
+ 
  shadow_offset=v_normalize({2,3})
  
  shadow_offset=v_mul(shadow_offset,0.2)
@@ -216,7 +219,7 @@ function init_cells()
  local x=a+cells.current[1]
  local y=b+cells.current[2]
  
- srand(x+y)
+ srand(seed+x*(cells.bounds[1]*2)+y)
  
  c.trees={}
  
@@ -537,13 +540,17 @@ function draw_player(shadow)
 end
 
 function draw_trees(shadows)
+ local c={
+  cam.p[1]%cells.w,
+  cam.p[2]%cells.h
+ }
  for a=0,cells.fill_x do
  for b=0,cells.fill_y do
  
  local trees=cells.a[a][b].trees
  camera(
- cam.p[1]%cells.w-a*cells.w,
- cam.p[2]%cells.h-b*cells.h
+ c[1]-a*cells.w,
+ c[2]-b*cells.h
  )
  
  if shadows then
@@ -559,32 +566,13 @@ function draw_trees(shadows)
  -- trunks
  color(4)
  for t in all(trees.a) do
-  line(
-  t.p[1],
-  t.p[2],
-  t.s[1],
-  t.s[2])
-  line(
-  t.p[1]+1,
-  t.p[2],
-  t.s[1],
-  t.s[2])
-  line(
-  t.p[1]-1,
-  t.p[2],
-  t.s[1],
-  t.s[2])
-  line(
-  t.p[1],
-  t.p[2]+1,
-  t.s[1],
-  t.s[2])
-  line(
-  t.p[1],
-  t.p[2]-1,
-  t.s[1],
-  t.s[2])
-  --circfill(t.p[1],t.p[2],1)
+  for x=-1,1 do
+  for y=-1,1 do
+  if abs(x)+abs(y)!=2 then
+   line(t.p[1]+x,t.p[2]+y,t.s[1],t.s[2])
+  end
+  end
+  end
  end
  -- leaves
  color(3)
