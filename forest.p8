@@ -110,7 +110,7 @@ function _init()
  p.stride_alt=false
  p.height=4
  
- 
+ p.r=4 
  -- camera
  cam={}
  cam.p=v_sub(p.p,{64,64})
@@ -555,19 +555,19 @@ function draw_player(shadow)
   circfill(
   p.p[1]+shadow_offset[1]*p.height,
   p.p[2]+shadow_offset[2]*p.height,
-  4,5)
+  p.r,5)
  else
-  local s=p.cur_speed/p.max_speed
+  local s=p.cur_speed/p.max_speed*p.r/4
   local p1={p.p[1],p.p[2]}
   local p2={
    p1[1]+p.height*cos(p.a)*s,
    p1[2]+p.height*sin(p.a)*s
   }
   
-  circfill(p1[1],p1[2],3,2)
-  circfill(p2[1],p2[2],2,4)
+  circfill(p1[1],p1[2],p.r*3/4,2)
+  circfill(p2[1],p2[2],p.r/2,4)
   p2=v_lerp(p1,p2,0.75)
-  circfill(p2[1],p2[2],2,13)
+  circfill(p2[1],p2[2],p.r/2,13)
   p2=v_lerp(p1,p2,0.5)
   pset(p2[1],p2[2],2)
   end
