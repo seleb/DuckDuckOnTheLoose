@@ -642,7 +642,6 @@ function draw_debug()
  
  print_ol("mem:"..stat(0)/1024,1,1,0,7)
  print_ol("cpu:"..stat(1),1,7,0,7)
- print_ol("cell:"..cells.current[1].." "..cells.current[2],1,15,0,7)
  print_ol("pos:"..p.p[1].." "..p.p[2],1,22,0,7)
 
  --crosshair
@@ -667,6 +666,9 @@ function draw_debug()
  (x+1)*cells.w-1,
  (y+1)*cells.h-1
  )
+ print(x.." "..y,
+ x*cells.w+3,
+ y*cells.h+3)
  end
  end
  
