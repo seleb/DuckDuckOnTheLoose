@@ -71,8 +71,8 @@ function _init()
  
  trees={}
  trees.height_range={10,25}
- trees.girth_range={5,10}
- trees.gap=32
+ trees.girth_range={6,12}
+ trees.gap=16
  
  clouds={}
  clouds.a={}
@@ -159,7 +159,7 @@ function _init()
     r=c.r
    end
    c.height=range(clouds.height_range)
-  
+   c.s=c.p
    
    add(clouds.a,c)
   end
@@ -198,6 +198,7 @@ function _init()
    else
     b.bloom=nil
    end
+   b.s=b.p
    
    add(bushes.a,b)
   end
@@ -220,7 +221,7 @@ function init_cells()
  c.trees={}
  
  c.trees.a={}
- c.trees.freq=rnd()
+ c.trees.freq=rnd(0.25)
  
  
  
@@ -538,6 +539,7 @@ end
 function draw_trees(shadows)
  for a=0,cells.fill_x do
  for b=0,cells.fill_y do
+ 
  local trees=cells.a[a][b].trees
  camera(
  cam.p[1]%cells.w-a*cells.w,
