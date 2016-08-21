@@ -529,7 +529,7 @@ function _draw()
  draw_trees(false)
  draw_clouds(false)
  
- --draw_debug()
+ draw_debug()
 end
 
 function draw_footprints()
@@ -550,6 +550,7 @@ end
 
 function draw_player(shadow)
  camera(cam.p[1],cam.p[2])
+ 
  if shadow then
   circfill(
   p.p[1]+shadow_offset[1]*p.height,
@@ -680,10 +681,6 @@ function draw_bushes(shadows)
     pset(p[1],p[2],b.c)
    end
   end
-  --[[color(8)
-  for b in all(bushes.a) do
-   
-  end]]
  end
 end
 
@@ -694,6 +691,7 @@ function draw_debug()
  print_ol("mem:"..stat(0)/1024,1,1,0,7)
  print_ol("cpu:"..stat(1),1,7,0,7)
  print_ol("cell:"..cells.current[1].." "..cells.current[2],1,15,0,7)
+ print_ol("pos:"..p.p[1].." "..p.p[2],1,22,0,7)
 
  --crosshair
  circ(64,64,1,0)
@@ -703,6 +701,8 @@ function draw_debug()
  for x=cells.current[1],cells.current[1]+cells.fill_x do
  for y=cells.current[2],cells.current[2]+cells.fill_y do
  if x==cells.current[1] and y==cells.current[2] then
+  color(10)
+ elseif abs(x)==cells.bounds[1] or abs(y)==cells.bounds[2] then
   color(8)
  else
   color(6)
@@ -714,6 +714,16 @@ function draw_debug()
  (y+1)*cells.h-1
  )
  end
+ end
+ 
+ 
+ for b in all(blobs) do
+  if b.hit then
+   color(8)
+  else
+   color(6)
+  end
+  circ(b.p[1],b.p[2],b.r)
  end
 end
 
