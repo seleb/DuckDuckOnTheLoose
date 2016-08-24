@@ -360,7 +360,7 @@ function _update()
  flr(cam.p[1]/cells.w),
  flr(cam.p[2]/cells.h)
  }
- if cell!=cells.current then
+ if cell[1]!=cells.current[1] or cell[2]!=cells.current[2] then
   cells.current=cell
   init_cells()
  end
