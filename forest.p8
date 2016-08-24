@@ -293,6 +293,9 @@ end
 
 function _update()
  
+ perspective_offset[1]=64+sin(time()/9)*4
+ perspective_offset[2]=80+sin(time()/11)*4
+ 
  local v_dif={0,0}
  if btn(0) then v_dif[1] -= p.speed[1] end
  if btn(1) then v_dif[1] += p.speed[1] end
