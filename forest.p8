@@ -732,15 +732,6 @@ end
 
 
 function draw_debug()
- camera(0,0)
- 
- print_ol("mem:"..stat(0)/1024,1,1,0,7)
- print_ol("cpu:"..stat(1),1,7,0,7)
- print_ol("pos:"..p.p[1].." "..p.p[2],1,22,0,7)
-
- --crosshair
- circ(64,64,1,0)
- 
  --cells
  camera(cam.p[1],cam.p[2])
  for x=cells.current[1],cells.current[1]+cells.fill_x do
@@ -789,6 +780,19 @@ function draw_debug()
  line(p.p[1],p.p[2],
  p.p[1]+p.r*cos(p.a),
  p.p[2]+p.r*sin(p.a))
+ 
+ 
+ 
+ camera(0,0)
+ 
+ print_ol("mem:"..stat(0)/1024,1,1,0,7)
+ print_ol("cpu:"..stat(1),1,7,0,7)
+ print_ol("pos:"..p.p[1].." "..p.p[2],1,22,0,7)
+
+ --crosshair
+ circ(64,64,1,0)
+ 
+ 
 end
 
 function print_ol(s,x,y,c1,c2)
