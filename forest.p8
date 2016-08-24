@@ -77,8 +77,8 @@ function _init()
  height_mult=0.015
  
  cells={}
- cells.w=64
- cells.h=64
+ cells.w=32
+ cells.h=32
  cells.fill_x=flr(128/cells.w+0.5)
  cells.fill_y=flr(128/cells.h+0.5)
  cells.bounds={128,64}
