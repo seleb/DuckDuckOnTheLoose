@@ -56,10 +56,11 @@ end
 
 
 function add_biome(
- colour,tree_range,transition)
+ colour,tree_range,bush_props,transition)
  local b={}
  b.tree_range=tree_range
  b.transition=transition
+ b.bush_props = bush_props
  
  
  biomes[colour]=b
@@ -87,14 +88,13 @@ function _init()
  biomes={}
  --empty biomes
  for i=0,15 do
-  add_biome(i,{0,0},false)
+  add_biome(i,{0,0},{0,0,{}},false)
  end
- add_biome(0,{0,0},true)
- add_biome(3,{0.25,0.5},true)
- add_biome(4,{0,0},true)
- add_biome(11,{0.1,0.3},true)
- add_biome(15,{0,0.2},true)
- 
+ add_biome(0,{0,0},{0,0,{}},true)
+ add_biome(3,{0.25,0.5},{0.5,05,{8,12,13,10}},true)
+ add_biome(4,{0,0},{0,0,{}},true)
+ add_biome(11,{0.1,0.3},{0.5,0.8,{8,12,13,10}},true)
+ add_biome(15,{0,0.2},{0.2,0.2,{11,13}},true)
  
  trees={}
  trees.height_range={10,25}
@@ -112,15 +112,10 @@ function _init()
  
  
  bushes={}
- bushes.a={}
  bushes.height_range={0.5,1.5}
  bushes.count_range={10,30}
  bushes.radius_range={1,2.5}
  bushes.cluster_range={2,4}
- bushes.bloom_freq=0.25
- bushes.bloom_colours={9,10,12,2}
- bushes.w=300
- bushes.h=300
  
  --player
  p={}
@@ -191,45 +186,6 @@ function _init()
    add(clouds.a,c)
   end
  end
- 
- -- bushes init
- for i=1,range(bushes.count_range) do
-  local x=rnd(bushes.w)-rnd(bushes.w)
-  local y=rnd(bushes.h)-rnd(bushes.h)
-  local r=0
-  local c=bushes.bloom_colours[flr(rnd(#bushes.bloom_colours))%#bushes.bloom_colours+1]
-  for j=1,range(bushes.cluster_range) do
-   local b={}
-   b.r=range(bushes.radius_range)
-   b.p={
-    x+range({1,(b.r+r)})-range({1,(b.r+r)/2}),
-    y+range({1,(b.r+r)})-range({1,(b.r+r)/2})
-   }
-   if rnd() > 0.5 then
-    x=b.p[1]
-    y=b.p[2]
-    r=b.r
-   end
-   b.height=range(bushes.height_range)
-   b.c=c
-   
-   if rnd() > bushes.bloom_freq then
-    local bloom={}
-    local a=rnd()
-    local r=rnd(b.r/2)+b.r/4
-    bloom.p={
-     r*cos(a),
-     r*sin(a)
-    }
-    b.bloom = bloom
-   else
-    b.bloom=nil
-   end
-   b.s=b.p
-   
-   add(bushes.a,b)
-  end
- end
 end
 
 function init_cells()
@@ -243,17 +199,14 @@ function init_cells()
  local x=a+cells.current[1]
  local y=b+cells.current[2]
  
+ -- seed the rng based on cell position
  c.seed=seed+x*(cells.bounds[1]*2)+y
  srand(c.seed)
  
  c.c=sget(x,y+64)
  c.biome=biomes[c.c]
  
- c.trees={}
- 
- c.trees.a={}
- c.trees.freq=ease(range(c.biome.tree_range))
- 
+ -- get colours for edge transition
  c.edges={}
  for u=-1,1 do
   c.edges[u]={}
@@ -265,6 +218,11 @@ function init_cells()
  end
  end
  
+ 
+ c.trees={}
+ local tree_freq=ease(range(c.biome.tree_range))
+ 
+ c.bushes={}
  
  if c.c==0 then
   -- boundaries
@@ -279,32 +237,74 @@ function init_cells()
   t.s=t.p
    
   t.leaves={{0,0},{0,0},{0,0}}
-  add(c.trees.a,t)
+  add(c.trees,t)
  else
- -- normal trees
- for x=0,cells.w-trees.gap,trees.gap do
- for y=0,cells.h-trees.gap,trees.gap do
-  if rnd() < c.trees.freq then
-   local t={}
-   t.height=range(trees.height_range)
-   t.girth=range(trees.girth_range)
-   t.p={
-    x+rnd(trees.gap),
-    y+rnd(trees.gap)
-   }
-   t.p[1]=mid(t.girth,t.p[1],cells.w-t.girth)
-   t.p[2]=mid(t.girth,t.p[2],cells.h-t.girth)
-   
-   t.s=t.p
-   t.leaves={{0,0},{0,0},{0,0}}
-   add(c.trees.a,t)
+  -- normal cell
+  
+  --trees
+  for x=0,cells.w-trees.gap,trees.gap do
+  for y=0,cells.h-trees.gap,trees.gap do
+   if rnd() < tree_freq then
+    local t={}
+    t.height=range(trees.height_range)
+    t.girth=range(trees.girth_range)
+    t.p={
+     x+rnd(trees.gap),
+     y+rnd(trees.gap)
+    }
+    t.p[1]=mid(t.girth,t.p[1],cells.w-t.girth)
+    t.p[2]=mid(t.girth,t.p[2],cells.h-t.girth)
+    
+    t.s=t.p
+    t.leaves={{0,0},{0,0},{0,0}}
+    add(c.trees,t)
+   end
   end
- end
+  end
+  
+  --bushes
+  if rnd() < c.biome.bush_props[1] then
+   local x=rnd(cells.w)
+   local y=rnd(cells.h)
+   local r=0
+   local bloom_colours=c.biome.bush_props[3]
+   local colour=bloom_colours[flr(rnd(#bloom_colours))%#bloom_colours+1]
+   for j=1,range(bushes.cluster_range) do
+    local b={}
+    b.r=range(bushes.radius_range)
+    b.p={
+     x+range({1,(b.r+r)})-range({1,(b.r+r)/2}),
+     y+range({1,(b.r+r)})-range({1,(b.r+r)/2})
+    }
+    if rnd() > 0.5 then
+     x=b.p[1]
+     y=b.p[2]
+     r=b.r
+    end
+    b.height=range(bushes.height_range)
+    b.c=colour
+    
+    if rnd() < c.biome.bush_props[2] then
+     local bloom={}
+     local a=rnd()
+     local r=rnd(b.r/2)+b.r/4
+     bloom.p={
+      r*cos(a),
+      r*sin(a)
+     }
+     b.bloom = bloom
+    else
+     b.bloom=nil
+    end
+    b.s=b.p
+   
+    add(c.bushes,b)
+   end
+  end
+ 
  end
  
  end
- end
- 
  end
 end
 
@@ -447,7 +447,7 @@ function update_trees()
  cam.p[2]%cells.h-y*cells.h
  }
  
- for t in all(ts.a) do
+ for t in all(ts) do
   t.s=v_sub(t.p,v_add(cellp,perspective_offset))
   t.s=v_mul(t.s,t.height*height_mult)
   
@@ -496,25 +496,24 @@ function update_clouds()
 end
 
 function update_bushes()
- for b in all(bushes.a) do
-  b.p[1]-=cam.v[1]
-  b.p[2]-=cam.v[2]
-  
-  if b.p[1] > bushes.w+bushes.radius_range[2] then
-   b.p[1] -= bushes.w*2+bushes.radius_range[2]
-  elseif b.p[1] < -bushes.w-bushes.radius_range[2] then
-   b.p[1] += bushes.w*2+bushes.radius_range[2]
-  end
-  if b.p[2] > bushes.h+bushes.radius_range[2] then
-   b.p[2] -= bushes.h*2+bushes.radius_range[2]
-  elseif b.p[2] < -bushes.h-bushes.radius_range[2] then
-   b.p[2] += bushes.h*2+bushes.radius_range[2]
-  end
-  
-  b.s=v_sub(b.p,perspective_offset)
+ for x=0,cells.fill_x do
+ for y=0,cells.fill_y do
+ 
+ local bs=cells.a[x][y].bushes
+ 
+ local cellp = {
+ cam.p[1]%cells.w-x*cells.w,
+ cam.p[2]%cells.h-y*cells.h
+ }
+ 
+ for b in all(bs) do
+  b.s=v_sub(b.p,v_add(cellp,perspective_offset))
   b.s=v_mul(b.s,b.height*height_mult)
+  
   b.s=v_add(b.p,b.s)
-    
+ end
+ 
+ end
  end
 end
 
@@ -642,14 +641,14 @@ function draw_trees(shadows)
  
  local trees=cells.a[a][b].trees
  camera(
- c[1]-a*cells.w,
- c[2]-b*cells.h
+  c[1]-a*cells.w,
+  c[2]-b*cells.h
  )
  
  if shadows then
  -- shadows
  color(5)
- for t in all(trees.a) do
+ for t in all(trees) do
   circfill(
   t.p[1]+shadow_offset[1]*t.height/2,
   t.p[2]+shadow_offset[2]*t.height/2,
@@ -658,7 +657,7 @@ function draw_trees(shadows)
  else
  -- trunks
  color(4)
- for t in all(trees.a) do
+ for t in all(trees) do
   for x=-1,1 do
   for y=-1,1 do
   if abs(x)+abs(y)!=2 then
@@ -669,15 +668,15 @@ function draw_trees(shadows)
  end
  -- leaves
  color(3)
- for t in all(trees.a) do
+ for t in all(trees) do
   circfill(t.leaves[1][1],t.leaves[1][2],t.girth)
  end
  color(11)
- for t in all(trees.a) do
+ for t in all(trees) do
   circfill(t.leaves[2][1],t.leaves[2][2],t.girth*0.75)
  end
  color(7)
- for t in all(trees.a) do
+ for t in all(trees) do
   circfill(t.leaves[3][1],t.leaves[3][2],t.girth*0.5)  
  end
  end
@@ -703,10 +702,22 @@ function draw_clouds(shadows)
 end
  
 function draw_bushes(shadows)
- camera(0,0)
+ local c={
+  cam.p[1]%cells.w,
+  cam.p[2]%cells.h
+ }
+ for a=0,cells.fill_x do
+ for b=0,cells.fill_y do
+ 
+ local bushes=cells.a[a][b].bushes
+ camera(
+  c[1]-a*cells.w,
+  c[2]-b*cells.h
+ )
+ 
  if shadows then
   color(5)
-  for b in all(bushes.a) do
+  for b in all(bushes) do
    circfill(
    b.p[1]+shadow_offset[1]*b.height,
    b.p[2]+shadow_offset[2]*b.height,
@@ -714,15 +725,18 @@ function draw_bushes(shadows)
   end
  else
   color(3)
-  for b in all(bushes.a) do
+  for b in all(bushes) do
    circfill(b.s[1],b.s[2],b.r)
   end
-  for b in all(bushes.a) do
+  for b in all(bushes) do
    if b.bloom!=nil then
     local p=v_add(b.s,b.bloom.p)
     pset(p[1],p[2],b.c)
    end
   end
+ end
+ 
+ end
  end
 end
 
@@ -732,6 +746,9 @@ function draw_debug()
  camera(cam.p[1],cam.p[2])
  for x=cells.current[1],cells.current[1]+cells.fill_x do
  for y=cells.current[2],cells.current[2]+cells.fill_y do
+ 
+ local cell=cells.a[x-cells.current[1]][y-cells.current[2]]
+ 
  if x==cells.current[1] and y==cells.current[2] then
   color(10)
  elseif
@@ -752,6 +769,12 @@ function draw_debug()
  print(x.." "..y,
  x*cells.w+3,
  y*cells.h+3)
+ print("ts:"..#cell.trees,
+ x*cells.w+3,
+ y*cells.h+10)
+ print("bs:"..#cell.bushes,
+ x*cells.w+3,
+ y*cells.h+17)
  end
  end
  
@@ -859,14 +882,14 @@ __gfx__
 00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000
 00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000
 00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000
-ffff3333333303333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333
-ffffffffff0f0ffffffffffffffffff3eeeeeeeeeeeee333333333333eee3333eeeeeeeeeeeee333333333333eee3333eeeeeeeeeeeee333333333333eee3333
-f33fffffffff0ffffffffffffffffff3eeeeeeeeeeeeeeeeeeeeeeee33333eeeeeeeeeeeeeeeeeeeeeeeeeee33333eeeeeeeeeeeeeeeeeeeeeeeeeee33333ee3
-fff3fffff0000ffffffffffffffffff3eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee3e
-fffffffffffffffffffffffffffffff3eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee3e
-ffffffffff33fffffffffffffffffff3eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee3
-3fffffff333333fffffffffffffffff3eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee3
-3fffff3f3b433ff3ffffffffffffff33eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee3
+333bbb44483303333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333
+333bbb44480f0ffffffffffffffffff3eeeeeeeeeeeee333333333333eee3333eeeeeeeeeeeee333333333333eee3333eeeeeeeeeeeee333333333333eee3333
+333bbb4448ff0ffffffffffffffffff3eeeeeeeeeeeeeeeeeeeeeeee33333eeeeeeeeeeeeeeeeeeeeeeeeeee33333eeeeeeeeeeeeeeeeeeeeeeeeeee33333ee3
+000666fff8000ffffffffffffffffff3eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee3e
+000666fff8fffffffffffffffffffff3eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee3e
+000666fff833fffffffffffffffffff3eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee3
+88888888883333fffffffffffffffff3eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee3
+ffffffff3b433ff3ffffffffffffff33eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee3
 3fffffff3bb0ff3333ffffffffffff33eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee3
 33ffff3333333330b3ffffffffffff33eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee3
 33ffffff3363f33003ffffffffffff33eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee3
