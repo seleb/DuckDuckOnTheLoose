@@ -54,6 +54,17 @@ function v_dist(a,b)
  return v_len(v_sub(a,b))
 end
 
+
+function add_biome(
+ colour,tree_range,transition)
+ local b={}
+ b.tree_range=tree_range
+ b.transition=transition
+ 
+ 
+ biomes[colour]=b
+end
+
 function _init()
  --srand(10) --for testing
  seed=rnd()
@@ -73,7 +84,16 @@ function _init()
  cells.bounds={128,64}
  cells.bound_str=2
  
- cells.colours={15,3,11}
+ biomes={}
+ --empty biomes
+ for i=0,15 do
+  add_biome(i,{0,0},false)
+ end
+ add_biome(3,{0.25,0.5},true)
+ add_biome(4,{0,0},true)
+ add_biome(11,{0.1,0.3},true)
+ add_biome(15,{0,0.2},true)
+ 
  
  trees={}
  trees.height_range={10,25}
@@ -225,12 +245,14 @@ function init_cells()
  c.seed=seed+x*(cells.bounds[1]*2)+y
  srand(c.seed)
  
+ c.c=sget(x,y+64)
+ c.biome=biomes[c.c]
+ 
  c.trees={}
  
  c.trees.a={}
- c.trees.freq=ease(rnd(0.5))
+ c.trees.freq=ease(range(c.biome.tree_range))
  
- c.c=sget(x,y+64)
  c.edges={}
  for u=-1,1 do
   c.edges[u]={}
@@ -514,7 +536,7 @@ function _draw()
  draw_trees(false)
  draw_clouds(false)
  
- draw_debug()
+ --draw_debug()
 end
 
 function draw_bg()
@@ -529,6 +551,8 @@ function draw_bg()
  local cell=cells.a[a][b]
  
  rectfill(x,y,x+cells.w,y+cells.h,cell.c)
+ 
+ if cell.biome.transition then
  srand(cell.seed)
  
  local c=cell.edges[1][0]
@@ -564,6 +588,8 @@ function draw_bg()
  end
  
  pal(7,7)
+ end
+ 
 end
 
 function draw_footprints()
@@ -849,18 +875,18 @@ __gfx__
 3fffff3f3b433ff3ffffffffffffff33eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee3
 3fffffff3bb3ff33ffffffffffffff33eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee3
 33ffff3333333333ffffffffffffff33eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee3
-33ffffff33f3f333ffffffffffffff33eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee3
-33ffffffffffff33ffffffffffffff33eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee3
-33ffffffffffffffffffffffffffff33888888888888888888888888888888888888888888888888888888888888888888888888888888888888888888888883
-33ffffffffffffffffffffffffffff33ee8eeeeeeeeeeeeeeeeeeeeeeeeeeeeeee8eeeeeeeeeeeeeeeeeeeeeeeeeeeeeee8eeeeeeeeeeeeeeeeeeeeeeeeeeee3
-33ffffffffffffffffffffffffffff33eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee3
-33ffffffffffffffffffffffffffff33eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee3
-33ffffff333ffffffffffffffffffff3eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee3
-33ffffff333fffffffffffffffffff33eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee3
-333ffff3333fffffffffff4fffffff33eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee33
-33ffff33333fffffffff4444ffffff33eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee33
-33fffff333ffffffff444444ffffff33eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee33
-333fffffffffffff444444444fffff33eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee33
+33ffffff3363f333ffffffffffffff33eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee3
+33ffffffff63ff33ffffffffffffff33eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee3
+33fffff6ff63ffffffffffffffffff33888888888888888888888888888888888888888888888888888888888888888888888888888888888888888888888883
+33ffff66ff63333fffffffffffffff33ee8eeeeeeeeeeeeeeeeeeeeeeeeeeeeeee8eeeeeeeeeeeeeeeeeeeeeeeeeeeeeee8eeeeeeeeeeeeeeeeeeeeeeeeeeee3
+33fff6666666666fffffffffffffff33eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee3
+33ffff66ff64444fffffffffffffff33eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee3
+33fffff6333ffffffffffffffffffff3eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee3
+33fffff6333fffffffffffffffffff33eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee3
+333ffff6333fffffffffff4fffffff33eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee33
+33ffff36333fffffffff4444ffffff33eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee33
+33fffff633ffffffff444444ffffff33eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee33
+333fff66ffffffff444444444fffff33eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee33
 33fffffffffffff44444444444ffff33eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee33
 333ffffffffffff44444444444ffff33eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee33
 333ffffffffffff444444444444ffff3eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee33
