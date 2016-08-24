@@ -490,6 +490,8 @@ function update_clouds()
   c.s=v_sub(c.p,perspective_offset)
   c.s=v_mul(c.s,c.height*height_mult)
   c.s=v_add(c.p,c.s)
+  
+  c.ps=v_add(c.p,v_mul(shadow_offset,c.height))
  end
 end
 
@@ -690,10 +692,7 @@ function draw_clouds(shadows)
  if shadows then
   color(5)
   for c in all(clouds.a) do
-   circfill(
-   c.p[1]+shadow_offset[1]*c.height,
-   c.p[2]+shadow_offset[2]*c.height,
-   c.r)
+   circfill(c.ps[1],c.ps[2],c.r)
   end
  else
   color(7)
