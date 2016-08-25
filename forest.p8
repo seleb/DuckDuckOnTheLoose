@@ -138,7 +138,7 @@ function _init()
  p.a=0
  p.a_o=0
  p.stride_w=4
- p.stride_l=8
+ p.stride_l=12
  p.stride_alt=false
  p.height=4
  
@@ -159,8 +159,8 @@ function _init()
  
  
  footprints={
-  {p.p[1],p.p[2]+p.stride_w},
-  {p.p[1],p.p[2]-p.stride_w}
+  {p.p[1],p.p[2]+p.stride_w,p.p[1],p.p[2]+p.stride_w},
+  {p.p[1],p.p[2]-p.stride_w,p.p[1],p.p[2]-p.stride_w}
  }
  footprints.max=64
  footprints.remove_delay=0.25
@@ -391,6 +391,11 @@ function _update()
  pcell=v_sub(pcell,cell)
  
  p.cell=cells.a[pcell[1]][pcell[2]]
+
+ update_footprints()
+end
+
+function update_footprints()
  if btn() > 0 then
   if stat(16) != p.cell.biome.foot_sfx then
    sfx(p.cell.biome.foot_sfx,0)
@@ -400,35 +405,29 @@ function _update()
  end
  
  if p.cell.biome.footprints then
- -- footprints
- local fa=p.a
- if p.stride_alt then
-  fa+=0.5
- end
- local fw=p.stride_w*(1-p.cur_speed/p.max_speed*0.8)*(1-abs(p.a-p.a_o))
- local fl=p.stride_l*(0.5+p.cur_speed/p.max_speed*0.5)
- local fp={
-  p.p[1]+fw*cos(fa+0.25),
-  p.p[2]+fw*sin(fa+0.25)
- }
- 
- if v_dist(fp,footprints[#footprints-1]) > fl then
-  -- add footprints
-  -- (actually just recycle existing ones)
-  for i=1,footprints.max-1 do
-   footprints[i]=footprints[i+1]
+  -- footprints
+  local fa=p.a
+  if p.stride_alt then
+   fa+=0.5
   end
-  footprints[footprints.max]=fp
-  p.stride_alt = not p.stride_alt
- elseif time() > footprints.remove_last+footprints.remove_delay then
- end
-  -- remove footprints by delay
-  for i=1,footprints.max-3,2 do
-   footprints[i]=footprints[i+2]
-   footprints[i+1]=footprints[i+3]
-  end
+  local fw=p.stride_w*(1-p.cur_speed/p.max_speed*0.8)*(1-abs(p.a-p.a_o))
+  local fl=p.stride_l*(0.5+p.cur_speed/p.max_speed*0.5)
+  local fp={
+   p.p[1]+fw*cos(fa+0.25),
+   p.p[2]+fw*sin(fa+0.25)
+  }
+  fp[3]=fp[1]-p.v[1]
+  fp[4]=fp[2]-p.v[2]
   
-  footprints.remove_last=time()
+  if v_distm(fp,footprints[footprints.max-1]) > fl then
+   -- add footprints
+   -- (actually just recycle existing ones)
+   for i=1,footprints.max-1 do
+    footprints[i]=footprints[i+1]
+   end
+   footprints[footprints.max]=fp
+   p.stride_alt = not p.stride_alt
+  end
  end
 end
 
@@ -620,17 +619,15 @@ end
 
 function draw_footprints()
  color(5)
- for f=4,#footprints,2 do
-  local f3=footprints[f-1]
-  local f4=footprints[f]
-  local f1=v_lerp(f3,footprints[f-3],0.25)
-  local f2=v_lerp(f4,footprints[f-2],0.25)
+ for f=2,#footprints,2 do
+  local f1=footprints[f-1]
+  local f2=footprints[f]
   
-  line(f1[1],f1[2],f3[1],f3[2])
-  line(f2[1],f2[2],f4[1],f4[2])
+  line(f1[1],f1[2],f1[3],f1[4])
+  line(f2[1],f2[2],f2[3],f2[4])
   
-  circfill(f3[1],f3[2],1)
-  circfill(f4[1],f4[2],1)
+  circfill(f1[1],f1[2],1)
+  circfill(f2[1],f2[2],1)
  end
 end
 
@@ -821,6 +818,8 @@ function draw_debug()
  line(p.p[1],p.p[2],
  p.p[1]+p.r*cos(p.a),
  p.p[2]+p.r*sin(p.a))
+ 
+ print_ol(p.cell.c,p.p[1]+3,p.p[2]+3,0,7)
  
  
  
