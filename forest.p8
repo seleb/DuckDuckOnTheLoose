@@ -44,6 +44,9 @@ end
 function v_len(v)
  return sqrt(v[1]*v[1]+v[2]*v[2])
 end
+function v_lenm(v)
+ return abs(v[1])+abs(v[2])
+end
 function v_normalize(v)
  return v_div(v,v_len(v))
 end
@@ -52,6 +55,9 @@ function v_lerp(a,b,t)
 end
 function v_dist(a,b)
  return v_len(v_sub(a,b))
+end
+function v_distm(a,b)
+ return v_lenm(v_sub(a,b))
 end
 
 
