@@ -136,9 +136,9 @@ function _init()
  bushes.cluster_range={2,4}
  
  buildings={}
- buildings.height_range={10,30}
- buildings.w_range={3,min(cells.w,cells.h)-16}
- buildings.h_range={3,min(cells.w,cells.h)-16}
+ buildings.height_range={10,35}
+ buildings.w_range={8,min(cells.w,cells.h)-16}
+ buildings.h_range={8,min(cells.w,cells.h)-16}
  buildings.colours={8,9,6}
  
  --player
@@ -601,6 +601,33 @@ function update_buildings()
    cam.p[2]%cells.h-y*cells.h
   }
   b.s=v_sub(b.p,v_add(cellp,perspective_offset))
+  
+  local s1=max(b.size[1],b.size[2])
+  local s2=min(b.size[1],b.size[2])
+  for i=-s1+s2/2,s1-s2/2,s2 do
+   local blob={}
+   blob.hit = false
+   blob.p = v_add({(cells.current[1]+x)*cells.w,(cells.current[2]+y)*cells.h},b.p)
+   if s1==b.size[1] then
+    blob.p[1]+=i
+   else
+    blob.p[2]+=i
+   end
+   blob.r = s2
+   add(blobs,blob)
+  end
+  local blob={}
+  blob.hit = false
+  blob.p = v_add({(cells.current[1]+x)*cells.w,(cells.current[2]+y)*cells.h},b.p)
+  if s1==b.size[1] then
+   blob.p[1]+=s1-s2/2
+  else
+   blob.p[2]+=s1-s2/2
+  end
+  blob.r = s2
+  if v_dist(blob.p,blobs[#blobs].p)>2 then
+   add(blobs,blob)
+  end
  end
  
  end
@@ -619,12 +646,12 @@ function _draw()
  draw_bushes(true)
  draw_player(true)
  draw_trees(true)
+ draw_buildings(true)
  draw_clouds(true) 
  
  draw_bushes(false)
  draw_player(false)
  draw_trees(false)
- draw_buildings(true)
  draw_buildings(false)
  draw_clouds(false)
  
@@ -788,13 +815,21 @@ function draw_buildings(shadows)
  
  if shadows then
  color(5)
- for i=0,b.height-1,3 do
+ for i=0,b.height/2,4 do
   local t={b.s[1],b.s[2]}
   t=v_mul(t,i*height_mult)
   t=v_add(b.p,t)
   rectfill(t[1]-b.size[1],t[2]-b.size[2],t[1]+b.size[1],t[2]+b.size[2])
  end
  else
+  color(5)
+  for i=b.height/2,b.height-1,4 do
+   local t={b.s[1],b.s[2]}
+   t=v_mul(t,i*height_mult)
+   t=v_add(b.p,t)
+   rectfill(t[1]-b.size[1],t[2]-b.size[2],t[1]+b.size[1],t[2]+b.size[2])
+  end
+ 
   local s=v_mul(b.s,b.height*height_mult)
   s=v_add(b.p,s)
   rectfill(s[1]-b.size[1],s[2]-b.size[2],s[1]+b.size[1],s[2]+b.size[2],b.c)
