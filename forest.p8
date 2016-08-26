@@ -77,8 +77,8 @@ end
 function _init()
  --srand(10) --for testing
  seed=rnd()
- palt(0,0)
- palt(14,1)
+ palt(0,false)
+ palt(14,true)
  
  shadow_offset=v_normalize({2,3})
  
