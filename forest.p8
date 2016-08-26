@@ -149,6 +149,7 @@ function _init()
  -- camera
  cam={}
  cam.p=v_sub(p.p,{64,64})
+ cam.c={0,0}
  cam.p_o=cam.p
  cam.offset={64,64}
  cam.sway={0.25,0.25,8,9}
@@ -375,6 +376,9 @@ function _update()
  )
  cam.v=v_sub(cam.p,cam.p_o)
 
+ cam.c[1]=cam.p[1]%cells.w
+ cam.c[2]=cam.p[2]%cells.h
+
  local cell={
  flr(cam.p[1]/cells.w),
  flr(cam.p[2]/cells.h)
@@ -541,8 +545,8 @@ function update_bushes()
  local bs=cells.a[x][y].bushes
  
  local cellp = {
- cam.p[1]%cells.w-x*cells.w,
- cam.p[2]%cells.h-y*cells.h
+  cam.p[1]%cells.w-x*cells.w,
+  cam.p[2]%cells.h-y*cells.h
  }
  
  for b in all(bs) do
@@ -669,17 +673,13 @@ function draw_player(shadow)
 end
 
 function draw_trees(shadows)
- local c={
-  cam.p[1]%cells.w,
-  cam.p[2]%cells.h
- }
  for a=0,cells.fill_x do
  for b=0,cells.fill_y do
  
  local trees=cells.a[a][b].trees
  camera(
-  c[1]-a*cells.w,
-  c[2]-b*cells.h
+  cam.c[1]-a*cells.w,
+  cam.c[2]-b*cells.h
  )
  
  if shadows then
@@ -739,17 +739,13 @@ function draw_clouds(shadows)
 end
  
 function draw_bushes(shadows)
- local c={
-  cam.p[1]%cells.w,
-  cam.p[2]%cells.h
- }
  for a=0,cells.fill_x do
  for b=0,cells.fill_y do
  
  local bushes=cells.a[a][b].bushes
  camera(
-  c[1]-a*cells.w,
-  c[2]-b*cells.h
+  cam.c[1]-a*cells.w,
+  cam.c[2]-b*cells.h
  )
  
  if shadows then
