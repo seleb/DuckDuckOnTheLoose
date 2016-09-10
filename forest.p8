@@ -78,7 +78,7 @@ function add_biome(
 end
 
 function _init()
- --srand(10) --for testing
+ srand(200) --for testing
  seed=rnd()
  palt(0,false)
  palt(14,true)
