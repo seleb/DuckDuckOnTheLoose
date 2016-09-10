@@ -41,8 +41,11 @@ function v_div(v,s)
   return {0,0}
  end
 end
+function v_len2(v)
+ return v[1]*v[1]+v[2]*v[2]
+end
 function v_len(v)
- return sqrt(v[1]*v[1]+v[2]*v[2])
+ return sqrt(v_len2(v))
 end
 function v_lenm(v)
  return abs(v[1])+abs(v[2])
@@ -494,10 +497,10 @@ function update_collision()
  -- blobs
  for b in all(blobs) do
   local d=v_sub(p.p,b.p)
-  local l=v_len(d)
-  if l < b.r then
+  local l2=v_len2(d)
+  if l2 < b.r2 then
    b.hit=true
-   p.v=v_add(p.v,v_div(d,l))
+   p.v=v_add(p.v,v_div(d,sqrt(l2)))
   else
    b.hit=false
   end
@@ -546,6 +549,7 @@ function update_trees()
   blob.hit = false
   blob.p = v_add({(cells.current[1]+x)*cells.w,(cells.current[2]+y)*cells.h},t.p)
   blob.r = t.girth
+  blob.r2=blob.r*blob.r
   add(blobs,blob)
  end
  
@@ -627,6 +631,7 @@ function update_buildings()
     blob.p[2]+=i
    end
    blob.r = s2
+   blob.r2=blob.r*blob.r
    add(blobs,blob)
   end
   local blob={}
@@ -638,6 +643,7 @@ function update_buildings()
    blob.p[2]+=s1-s2/2
   end
   blob.r = s2
+  blob.r2=blob.r*blob.r
   if v_dist(blob.p,blobs[#blobs].p)>2 then
    add(blobs,blob)
   end
