@@ -116,7 +116,7 @@ function _init()
  
  trees={}
  trees.height_range={10,25}
- trees.girth_range={6,12}
+ trees.girth_range={4,10}
  trees.gap=16
  
  clouds={}
@@ -260,7 +260,7 @@ function init_cells()
   c.c=3
   local t={}
   t.height=range(trees.height_range)
-  t.girth=min(cells.w,cells.h)/2
+  t.girth=min(cells.w,cells.h)*2/5
   t.p={
    cells.w/2,
    cells.h/2
@@ -782,18 +782,14 @@ function draw_trees(shadows)
   end
  end
  -- leaves
- color(3)
+ c={{3,1},{11,0.7},{7,0.4}}
+ for i=1,3 do
+ color(c[i][1])
  for t in all(trees) do
-  circfill(t.leaves[1][1],t.leaves[1][2],t.girth)
+  circfill(t.leaves[i][1],t.leaves[i][2],t.girth*c[i][2])
  end
- color(11)
- for t in all(trees) do
-  circfill(t.leaves[2][1],t.leaves[2][2],t.girth*0.75)
  end
- color(7)
- for t in all(trees) do
-  circfill(t.leaves[3][1],t.leaves[3][2],t.girth*0.5)  
- end
+ 
  end
  
  end
