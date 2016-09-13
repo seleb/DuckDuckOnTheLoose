@@ -215,6 +215,29 @@ function _init()
    add(clouds.a,c)
   end
  end
+ 
+ 
+ 
+ 
+ -- npc sprite
+ npcs={
+ 	{who="dumb alien",spr=15,mouth=10,mouth_offset=-4},
+ 	{who="spooky ghost",spr=14,mouth=7,mouth_offset=0},
+ 	{who="giddy girl",spr=13,mouth=0,mouth_offset=2},
+ 	{who="hipster",spr=12,mouth=0,mouth_offset=0},
+ 	{who="thumbs up",spr=11,mouth=0,mouth_offset=0},
+ 	{who="swimmer",spr=10,mouth=0,mouth_offset=-4},
+ 	{who="bouncer",spr=9,mouth=0,mouth_offset=-4},
+ 	{who="pupper",spr=8,mouth=0,mouth_offset=0},
+ 	{who="?",spr=7,mouth=0,mouth_offset=0},
+ 	{who="blondie",spr=6,mouth=2,mouth_offset=0},
+ 	{who="buddy boy",spr=5,mouth=0,mouth_offset=2},
+ 	{who="ranger",spr=4,mouth=0,mouth_offset=0},
+ 	{who="scarf mcgee",spr=3,mouth=0,mouth_offset=0},
+ 	{who="duckling",spr=2,mouth=-1,mouth_offset=0},
+ 	{who="drake",spr=1,mouth=-1,mouth_offset=0},
+ 	{who="hen",spr=0,mouth=-1,mouth_offset=0}
+ }
 end
 
 function init_cells()
@@ -676,85 +699,14 @@ function _draw()
  
  --draw_debug()
  
- 
- local t=time()
- for i=0,3 do
-  sspr(40+7*i,16,7,10,12+12*i,10+sin(t+i/3),14,20)
- end
- for i=0,3 do
-  sspr(40+7*i,16,7,10,9+12*(i+4)+8,10+sin(t+(i+1)/3),14,20)
- end
- local s=" on the"
- for i=1,#s do
-  print_ol(sub(s,i,i),64+(i-1)*4-#s*2,35+sin(t/2+i/#s),7,0)
- end
- 
- for i=0,4 do
-  sspr(68+7*i,16,7,10,9+12*(i+2),44+sin(t+(i+2)/3),14,20)
- end
- 
- -- duck sprite
- local a=abs(sin(p.quack_timer/40))*5-abs(sin(time()/2))*3
- a=flr(a)
- sx=72
- if p.quack_timer > 0 then
-  sx+=16
- end
- sspr(sx,0,16,16,0,128-32-a,32,32+a)
+ draw_title()
+ draw_duckface()
+ draw_npcface()
  
  
- -- npc sprite
- npcs={
- 	{who="dumb alien",spr=15,mouth=10,mouth_offset=-4},
- 	{who="spooky ghost",spr=14,mouth=7,mouth_offset=0},
- 	{who="giddy girl",spr=13,mouth=0,mouth_offset=2},
- 	{who="hipster",spr=12,mouth=0,mouth_offset=0},
- 	{who="thumbs up",spr=11,mouth=0,mouth_offset=0},
- 	{who="swimmer",spr=10,mouth=0,mouth_offset=-4},
- 	{who="bouncer",spr=9,mouth=0,mouth_offset=-4},
- 	{who="pupper",spr=8,mouth=0,mouth_offset=0},
- 	{who="?",spr=7,mouth=0,mouth_offset=0},
- 	{who="blondie",spr=6,mouth=2,mouth_offset=0},
- 	{who="buddy boy",spr=5,mouth=0,mouth_offset=2},
- 	{who="ranger",spr=4,mouth=0,mouth_offset=0},
- 	{who="scarf mcgee",spr=3,mouth=0,mouth_offset=0},
- 	{who="duckling",spr=2,mouth=-1,mouth_offset=0},
- 	{who="drake",spr=1,mouth=-1,mouth_offset=0},
- 	{who="hen",spr=0,mouth=-1,mouth_offset=0}
- }
  
- sx=0
- sy=32
- npc=npcs[8]
- sx+=npc.spr*16
- while(sx >= 128) do
-  sx-=128
-  sy+=16
- end
- sspr(sx,sy,16,16,128-32,128-32-a,32,32+a)
+ draw_dialog()
  
- -- npc mouth
- if npc.mouth >= 0 then
-  pal(0,npc.mouth)
-  sx=40
-  if p.quack_timer > 0 and time()%0.2 > 0.1 then
-   sx+=16
-  end
-  sspr(sx,0,16,16,128-32,128-32-a+npc.mouth_offset,32,32+a)
-  pal(0,0)
- end
- 
- -- quack text
- if btn(4) then
-  print_ol("\142 \149 quack \149",40,127-16,0,7)
- else
-  print_ol("\142 \149 quack \149",40,127-16,7,0)
- end
- if btn(5) then
-  print_ol("\151 \150 quack \150 ",40,127-8,0,7)
- else 
-  print_ol("\151 \150 quack \150 ",40,127-8,7,0)
- end
 end
 
 function draw_bg()
@@ -1053,6 +1005,80 @@ function draw_debug()
  circ(64,64,1,0)
  
  
+end
+
+
+function draw_title()
+ local t=time()
+ local t2=t
+ for i=0,3 do
+  pal(0,(i+t2)%2+2)
+  sspr(40+7*i,16,7,10,12+12*i,10+sin(t+i/3),14,20)
+ end
+ for i=0,3 do
+  pal(0,(i+t2+4)%2+2)
+  sspr(40+7*i,16,7,10,9+12*(i+4)+8,10+sin(t+(i+1)/3),14,20)
+ end
+ local s=" on the"
+ for i=1,#s do
+  pal(0,(i+t2)%2+2)
+  print_ol(sub(s,i,i),64+(i-1)*4-#s*2,35+sin(t/2+i/#s),7,0)
+ end
+ 
+ for i=0,4 do
+  pal(0,(i+t2)%2+2)
+  sspr(68+7*i,16,7,10,9+12*(i+2),44+sin(t+(i+2)/3),14,20)
+ end
+ pal(0,0)
+end
+
+function draw_duckface()
+ local a=abs(sin(p.quack_timer/40))*5-abs(sin(time()/2))*3
+ a=flr(a)
+ sx=72
+ if p.quack_timer > 0 then
+  sx+=16
+ end
+ sspr(sx,0,16,16,0,128-32-a,32,32+a)
+end
+
+function draw_npcface()
+ local a=abs(sin(p.quack_timer/40))*5-abs(sin(time()/2))*3
+ a=flr(a)
+ sx=0
+ sy=32
+ npc=npcs[15]
+ sx+=npc.spr*16
+ while(sx >= 128) do
+  sx-=128
+  sy+=16
+ end
+ sspr(sx,sy,16,16,128-32,128-32-a,32,32+a)
+ 
+ -- npc mouth
+ if npc.mouth >= 0 then
+  pal(0,npc.mouth)
+  sx=40
+  if p.quack_timer > 0 and time()%0.2 > 0.1 then
+   sx+=16
+  end
+  sspr(sx,0,16,16,128-32,128-32-a+npc.mouth_offset,32,32+a)
+  pal(0,0)
+ end
+end
+
+function draw_dialog()
+ -- quack text
+ if btn(4) then
+  print_ol("Ž • quack •",35,127-16,0,7)
+ else
+  print_ol("Ž • quack •",35,127-16,7,0)
+ end
+ if btn(5) then
+  print_ol("— – quack – ",35,127-8,0,7)
+ else 
+  print_ol("— – quack – ",35,127-8,7,0)
+ end
 end
 
 function print_ol(s,x,y,c1,c2)
