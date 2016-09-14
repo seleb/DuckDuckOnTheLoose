@@ -164,7 +164,7 @@ function _init()
  p.r2=p.r*p.r
  -- camera
  cam={}
- cam.p=v_sub(p.p,{64,64})
+ cam.p=v_sub(p.p,{64,64+24})
  cam.c={0,0}
  cam.p_o=cam.p
  cam.offset={64,64}
