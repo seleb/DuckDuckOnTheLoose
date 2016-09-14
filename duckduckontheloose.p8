@@ -238,6 +238,20 @@ function _init()
  	{who="drake",spr=1,mouth=-1,mouth_offset=0},
  	{who="hen",spr=0,mouth=-1,mouth_offset=0}
  }
+ 
+ for npc in all(npcs) do
+  npc.p={rnd(128),rnd(128)}
+  npc.c1=rnd(16)
+  npc.c2=rnd(16)
+  npc.r=4
+  npc.height=6
+  npc.id=flr(rnd(16))
+ end
+ 
+ talk={}
+ talk.npc=nil
+ talk.lines={}
+ 
 end
 
 function init_cells()
@@ -461,6 +475,7 @@ function _update()
  update_clouds()
  update_bushes()
  update_buildings()
+ update_npcs()
  update_collision()
  
  
@@ -474,6 +489,7 @@ function _update()
  p.cell=cells.a[pcell[1]][pcell[2]]
 
  update_footprints()
+ update_dialog()
 end
 
 function update_footprints()
@@ -676,7 +692,28 @@ function update_buildings()
  end
 end
 
+function update_npcs()
+ for npc in all(npcs) do
+  --npc.p={64,64}
+  --npc.id=5
+  --npc.r=4
+  --npc.height=6
+  --npc.c1=8
+  --npc.c2=10
+  npc.s=v_sub(npc.p,v_add(cam.p,perspective_offset))
+  npc.s=v_mul(npc.s,npc.height*height_mult)
+  npc.s=v_add(npc.p,npc.s)
+ end
+end
 
+function update_dialog()
+ talk.npc=nil
+ for npc in all(npcs) do
+  if v_dist(npc.p,p.p) < (npc.r+p.r)*2 then
+   talk.npc=npc
+  end
+ end
+end
 
 function _draw()
  draw_bg()
@@ -687,25 +724,27 @@ function _draw()
  
  draw_bushes(true)
  draw_player(true)
+ draw_npcs(true)
  draw_trees(true)
  draw_buildings(true)
  draw_clouds(true) 
  
  draw_bushes(false)
  draw_player(false)
+ draw_npcs(false)
  draw_trees(false)
  draw_buildings(false)
  draw_clouds(false)
- 
  --draw_debug()
  
- draw_title()
- draw_duckface()
- draw_npcface()
+ --draw_title()
  
- 
- 
- draw_dialog()
+ if talk.npc!=nil then
+  camera(0,0)
+  draw_duckface()
+  draw_npcface()
+  draw_dialog()
+ end
  
 end
 
@@ -937,6 +976,24 @@ function draw_bushes(shadows)
  end
 end
 
+function draw_npcs(shadows)
+ camera(cam.p[1],cam.p[2])
+ 
+ if shadows then
+  for npc in all(npcs) do
+   circfill(
+    npc.p[1]+shadow_offset[1]*npc.height*height_mult,
+    npc.p[2]+shadow_offset[2]*npc.height*height_mult,
+    npc.r,5)
+  end
+ else
+  for npc in all(npcs) do
+   local s=v_lerp(npc.s,npc.p,0.5)
+   circfill(s[1],s[2],npc.r,npc.c1)
+   circfill(npc.s[1],npc.s[2],npc.r*0.66,npc.c2)
+  end
+ end
+end
 
 function draw_debug()
  --cells
@@ -1048,7 +1105,7 @@ function draw_npcface()
  a=flr(a)
  sx=0
  sy=32
- npc=npcs[15]
+ npc=npcs[10]
  sx+=npc.spr*16
  while(sx >= 128) do
   sx-=128
