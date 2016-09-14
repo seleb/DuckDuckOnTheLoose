@@ -161,6 +161,7 @@ function _init()
  p.quack_timer=0
  
  p.r=4 
+ p.r2=p.r*p.r
  -- camera
  cam={}
  cam.p=v_sub(p.p,{64,64})
@@ -221,31 +222,67 @@ function _init()
  
  -- npc sprite
  npcs={
- 	{who="dumb alien",spr=15,mouth=10,mouth_offset=-4},
- 	{who="spooky ghost",spr=14,mouth=7,mouth_offset=0},
- 	{who="giddy girl",spr=13,mouth=0,mouth_offset=2},
- 	{who="hipster",spr=12,mouth=0,mouth_offset=0},
- 	{who="thumbs up",spr=11,mouth=0,mouth_offset=0},
- 	{who="swimmer",spr=10,mouth=0,mouth_offset=-4},
- 	{who="bouncer",spr=9,mouth=0,mouth_offset=-4},
- 	{who="pupper",spr=8,mouth=0,mouth_offset=0},
- 	{who="?",spr=7,mouth=0,mouth_offset=0},
- 	{who="blondie",spr=6,mouth=2,mouth_offset=0},
- 	{who="buddy boy",spr=5,mouth=0,mouth_offset=2},
- 	{who="ranger",spr=4,mouth=0,mouth_offset=0},
- 	{who="scarf mcgee",spr=3,mouth=0,mouth_offset=0},
- 	{who="duckling",spr=2,mouth=-1,mouth_offset=0},
- 	{who="drake",spr=1,mouth=-1,mouth_offset=0},
- 	{who="hen",spr=0,mouth=-1,mouth_offset=0}
+ 	{who="dumb alien",spr=15,
+ 	mouth=10,mouth_offset=-4,
+ 	c1=0,c2=11,r=4,height=4},
+ 	{who="spooky ghost",spr=14,
+ 	mouth=7,mouth_offset=0,
+ 	c1=7,c2=7,r=3,height=4},
+ 	{who="giddy girl",spr=13,
+ 	mouth=0,mouth_offset=2,
+ 	c1=10,c2=8,r=3,height=2},
+ 	{who="hipster",spr=12,
+ 	mouth=0,mouth_offset=0,
+ 	c1=13,c2=15,r=3,height=4},
+ 	{who="thumbs up",spr=11,
+ 	mouth=0,mouth_offset=0,
+ 	c1=1,c2=15,r=4,height=4},
+ 	{who="swimmer",spr=10,
+ 	mouth=0,mouth_offset=-4,
+ 	c1=10,c2=13,r=4,height=3},
+ 	{who="bouncer",spr=9,
+ 	mouth=0,mouth_offset=-4,
+ 	c1=9,c2=15,r=4,height=4},
+ 	{who="pupper",spr=8,
+ 	mouth=0,mouth_offset=0,
+ 	c1=4,c2=4,r=3,height=2},
+ 	{who="?",spr=7,
+ 	mouth=0,mouth_offset=0,
+ 	c1=2,c2=4,r=4,height=4},
+ 	{who="blondie",spr=6,
+ 	mouth=2,mouth_offset=0,
+ 	c1=8,c2=10,r=4,height=3},
+ 	{who="buddy boy",spr=5,
+ 	mouth=0,mouth_offset=2,
+ 	c1=12,c2=15,r=3,height=2},
+ 	{who="ranger",spr=4,
+ 	mouth=0,mouth_offset=0,
+ 	c1=3,c2=15,r=4,height=4},
+ 	{who="scarf mcgee",spr=3,
+ 	mouth=0,mouth_offset=0,
+ 	c1=5,c2=4,r=4,height=4},
+ 	{who="duckling",spr=2,
+ 	mouth=-1,mouth_offset=0,
+ 	c1=9,c2=10,r=2,height=2},
+ 	{who="drake",spr=1,
+ 	mouth=-1,mouth_offset=0,
+ 	c1=4,c2=3,r=3,height=2},
+ 	{who="hen",spr=0,
+ 	mouth=-1,mouth_offset=0,
+ 	c1=5,c2=4,r=3,height=2}
  }
  
  for npc in all(npcs) do
-  npc.p={rnd(128),rnd(128)}
-  npc.c1=rnd(16)
-  npc.c2=rnd(16)
-  npc.r=4
-  npc.height=6
-  npc.id=flr(rnd(16))
+  npc.p={rnd(cells.w),rnd(cells.h)}
+  --npc.c1=rnd(16)%8+8
+  --npc.c2=rnd(16)%8+8
+  --npc.r=rnd(3)+2
+  npc.r2=npc.r*npc.r
+  --npc.height=6
+  npc.cell={flr(rnd(cells.bounds[1])),flr(rnd(cells.bounds[2]))}
+  
+  npc.cell[1]=flr(rnd(6))
+  npc.cell[2]=flr(rnd(6))
  end
  
  talk={}
@@ -396,6 +433,15 @@ function init_cells()
  end
 end
 
+function add_blob(p,r)
+ local blob={}
+ blob.hit = false
+ blob.p = p
+ blob.r = r
+ blob.r2=blob.r*blob.r
+ add(blobs,blob)
+end
+
 function _update()
  
  if btnp(4) then
@@ -537,7 +583,7 @@ function update_collision()
  for b in all(blobs) do
   local d=v_sub(p.p,b.p)
   local l2=v_len2(d)
-  if l2 < b.r2 then
+  if l2 < b.r2+p.r2 then
    b.hit=true
    p.v=v_add(p.v,v_div(d,sqrt(l2)))
   else
@@ -583,13 +629,8 @@ function update_trees()
   t.leaves[2]=v_lerp(t.p,t.s,0.75)
   t.leaves[3]=t.s
   
+  add_blob(v_add({(cells.current[1]+x)*cells.w,(cells.current[2]+y)*cells.h},t.p), t.girth)
   
-  local blob={}
-  blob.hit = false
-  blob.p = v_add({(cells.current[1]+x)*cells.w,(cells.current[2]+y)*cells.h},t.p)
-  blob.r = t.girth
-  blob.r2=blob.r*blob.r
-  add(blobs,blob)
  end
  
  end
@@ -700,17 +741,37 @@ function update_npcs()
   --npc.height=6
   --npc.c1=8
   --npc.c2=10
-  npc.s=v_sub(npc.p,v_add(cam.p,perspective_offset))
+  
+  --local p=v_add(npc.cell, cells.current)
+  npc.p2={npc.cell[1],npc.cell[2]}
+  
+  if v_distm(npc.p2,v_add(cells.current,{2,2})) <= 4 then
+  npc.active=true
+  npc.p2[1]*=cells.w
+  npc.p2[2]*=cells.h
+  npc.p2=v_add(npc.p, npc.p2)
+  
+  npc.s=v_sub(npc.p2,v_add(cam.p,perspective_offset))
   npc.s=v_mul(npc.s,npc.height*height_mult)
-  npc.s=v_add(npc.p,npc.s)
+  npc.s=v_add(npc.p2,npc.s)
+  
+  add_blob(npc.p2,npc.r)
+  else
+  npc.active=false
+  end
  end
 end
 
 function update_dialog()
  talk.npc=nil
+ talk.r=10000
  for npc in all(npcs) do
-  if v_dist(npc.p,p.p) < (npc.r+p.r)*2 then
-   talk.npc=npc
+  if npc.active then
+   local r=v_dist(npc.p2,p.p)
+   if r<talk.r and r < (npc.r+p.r)*2.5 then
+    talk.npc=npc
+    talk.r=r
+   end
   end
  end
 end
@@ -735,6 +796,7 @@ function _draw()
  draw_trees(false)
  draw_buildings(false)
  draw_clouds(false)
+ 
  --draw_debug()
  
  --draw_title()
@@ -981,16 +1043,20 @@ function draw_npcs(shadows)
  
  if shadows then
   for npc in all(npcs) do
-   circfill(
-    npc.p[1]+shadow_offset[1]*npc.height*height_mult,
-    npc.p[2]+shadow_offset[2]*npc.height*height_mult,
-    npc.r,5)
+   if npc.active then
+    circfill(
+     npc.p2[1]+shadow_offset[1]*npc.height,
+     npc.p2[2]+shadow_offset[2]*npc.height,
+     npc.r,5)
+   end
   end
  else
   for npc in all(npcs) do
-   local s=v_lerp(npc.s,npc.p,0.5)
-   circfill(s[1],s[2],npc.r,npc.c1)
-   circfill(npc.s[1],npc.s[2],npc.r*0.66,npc.c2)
+   if npc.active then
+    local s=v_lerp(npc.s,npc.p2,0.75)
+    circfill(s[1],s[2],npc.r,npc.c1)
+    circfill(npc.s[1],npc.s[2],npc.r-1,npc.c2)
+   end
   end
  end
 end
@@ -1105,7 +1171,8 @@ function draw_npcface()
  a=flr(a)
  sx=0
  sy=32
- npc=npcs[10]
+ local npc=talk.npc
+ printh(npc.mouth)
  sx+=npc.spr*16
  while(sx >= 128) do
   sx-=128
