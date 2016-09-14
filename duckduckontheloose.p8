@@ -334,7 +334,7 @@ function init_cells()
  srand(c.seed)
  
  if x<0 or x>cells.bounds[1]-1 or y<0 or y>cells.bounds[2]-1 then
-  c.c=14
+  c.c=1
  else
   c.c=mapdata[y][x]
  end
@@ -346,7 +346,7 @@ function init_cells()
   c.edges[u]={}
  for v=-1,1 do
   if x+u<0 or x+u>cells.bounds[1]-1 or y+v<0 or y+v>cells.bounds[2]-1 then
-   c.edges[u][v]=14
+   c.edges[u][v]=1
   else
    c.edges[u][v]=mapdata[y+v][x+u]
   end
