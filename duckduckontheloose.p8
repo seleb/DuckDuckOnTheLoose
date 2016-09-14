@@ -311,7 +311,8 @@ function _init()
  talk={}
  talk.npc=nil
  talk.lines={}
- 
+ talk.offset=0
+
  menu=0
 end
 
@@ -480,7 +481,7 @@ function _update()
   if menu==0 then
    if btnp(4) or btnp(5) then
     menu-=1
-    sfx(7,2)
+    sfx(7,3)
    end
   else
    menu+=menu/4
@@ -490,14 +491,6 @@ function _update()
    end
   end
  else
-  -- quack
-  if btnp(4) then
-   sfx(5,2)
-   p.quack_timer=10
-  elseif btnp(5) then
-   sfx(6,2)
-   p.quack_timer=10
-  end
   
   -- movement
   if btn(0) then v_dif[1] -= p.speed[1] end
@@ -517,6 +510,17 @@ function _update()
    sfx(-1,0)
   end
  
+ end
+ 
+ 
+ 
+ -- quack
+ if btnp(4) then
+  sfx(5,2)
+  p.quack_timer=10
+ elseif btnp(5) then
+  sfx(6,2)
+  p.quack_timer=10
  end
  
  if p.quack_timer>0 then
@@ -818,7 +822,6 @@ function update_npcs()
 end
 
 function update_dialog()
- talk.npc=nil
  talk.r=10000
  for npc in all(npcs) do
   if npc.active then
@@ -828,6 +831,12 @@ function update_dialog()
     talk.r=r
    end
   end
+ end
+ 
+ if talk.r==10000 then
+  talk.offset=lerp(talk.offset,-32,0.25)
+ else
+  talk.offset=lerp(talk.offset,0,0.25) 
  end
 end
 
@@ -839,15 +848,15 @@ function _draw()
  draw_footprints()
  
  draw_bushes(true)
- draw_player(true)
  draw_npcs(true)
+ draw_player(true)
  draw_trees(true)
  draw_buildings(true)
  draw_clouds(true) 
  
  draw_bushes(false)
- draw_player(false)
  draw_npcs(false)
+ draw_player(false)
  draw_trees(false)
  draw_buildings(false)
  draw_clouds(false)
@@ -855,10 +864,9 @@ function _draw()
  --draw_debug()
  
  if menu!=nil then
-  camera(0,menu)
   draw_menu()
- elseif talk.npc!=nil then
-  camera(0,0)
+ elseif talk.offset > -32 then
+  camera(0,talk.offset)
   draw_duckface()
   draw_npcface()
   draw_dialog()
@@ -1213,17 +1221,34 @@ function draw_title()
 end
 
 function draw_menu()
+ camera(0,menu)
  draw_title()
  draw_duckface()
  talk.npc=npcs[15]
  draw_npcface()
+ 
+ -- quack text
+ if btn(4) then
+  print_ol("Ž • quack •",35,127-16,0,7)
+ else
+  print_ol("Ž • quack •",35,127-16,7,0)
+ end
+ if btn(5) then
+  print_ol("— – quack – ",35,127-8,0,7)
+ else 
+  print_ol("— – quack – ",35,127-8,7,0)
+ end
 end
 
 function draw_duckface()
- local a=abs(sin(p.quack_timer/40))*5-abs(sin(time()/2))*3
+ local t=p.quack_timer
+ if menu!=nil then
+  t=0
+ end
+ local a=abs(sin(t/40))*5-abs(sin(time()/2))*3
  a=flr(a)
  sx=72
- if p.quack_timer > 0 then
+ if t > 0 then
   sx+=16
  end
  sspr(sx,0,16,16,0,128-32-a,32,32+a)
@@ -1449,7 +1474,7 @@ __sfx__
 001000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000
 010100001117505171071710a1710e175122741827111271102711124114231232511d26124271292750000000000000000000000000000000000000000000000000000000000000000000000000000000000000
 010100000517505171071710a1710e175122741827111271102711124114231172511d26118271112750000000000000000000000000000000000000000000000000000000000000000000000000000000000000
-000400002b050360503b05036050120000d000090000700006010040100501007010090200b0300e03011030150401d050210502805030060370603d060000000000000000000000000000000000000000000000
+000400002b000360003b00036000120000d000090000700006010040100501007010090200b0300e03011030150401d050210502805030060370603d060000000000000000000000000000000000000000000000
 001000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000
 001000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000
 001000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000
