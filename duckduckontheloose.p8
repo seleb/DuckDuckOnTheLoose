@@ -147,7 +147,7 @@ function _init()
  
  --player
  p={}
- p.p={64,64}
+ p.p=v_mul({0,0},32)
  p.v={0,0}
  p.speed={0.7,0.7}
  p.max_speed=3
@@ -307,12 +307,53 @@ function _init()
   
   npc.cell[1]=flr(rnd(6))
   npc.cell[2]=flr(rnd(6))
+  
+  npc.lines="oh hey duck duck!|this is just some test dialog.|it's the same for every character!|i'm just gonna say this now.|"
+  
+  -- add breaks into lines
+  -- (no word breaks)
+  local l=npc.lines
+  local lw=0
+  local ww=0
+  local word=""
+  npc.lines=""
+  while #l > 0 do
+   --get next letter
+   local c=sub(l,1,1)
+   l=sub(l,2,#l)
+   word=word..c
+   
+   -- word ends
+   if c==" " or c=="\n" or c=="|" or #l==0 then
+    if #word+lw>=16 then
+     npc.lines=npc.lines.."\n"
+     lw=0
+    end
+    
+    npc.lines=npc.lines..word
+    lw+=#word
+    word=""
+    -- newline characters
+    if c=="\n" or c=="|" then
+     lw=0
+    end
+   end
+  end
+  
+  -- save the last line for repeating
+  local l=#npc.lines
+  repeat
+   l-=1
+  until sub(npc.lines,l,l) == "|"
+  npc.lastline = sub(npc.lines,l,#npc.lines)
  end
  
  talk={}
  talk.npc=nil
- talk.lines={}
+ talk.say=""
+ talk.said=""
  talk.offset=0
+ talk.offset_target=40
 
  menu=0
 end
@@ -823,6 +864,7 @@ function update_npcs()
 end
 
 function update_dialog()
+ local prev=talk.npc
  talk.r=10000
  for npc in all(npcs) do
   if npc.active then
@@ -834,10 +876,61 @@ function update_dialog()
   end
  end
  
+ if prev!=talk.npc then
+  if #talk.npc.lines > 0 then
+   talk.say=talk.npc.lines
+  else
+   talk.say=sub(talk.npc.lastline,2,#talk.npc.lastline)
+  end
+  talk.said=""
+  printh(talk.npc.who..": "..talk.say)
+ end
+ 
+ -- transition view
  if talk.r==10000 then
-  talk.offset=lerp(talk.offset,-32,0.25)
+  talk.offset=lerp(talk.offset,-talk.offset_target,0.25)
  else
   talk.offset=lerp(talk.offset,0,0.25) 
+ end
+ 
+ 
+ local s=sub(talk.say,1,1)
+ local skip=btnp(4) or btnp(5)
+ 
+ --skip only applied mid-line
+ if s=="|" then
+  skip = false
+ else
+ end
+ 
+ -- handle text
+ if talk.npc!=nil then
+  if #talk.say <= 1 then
+   talk.say=talk.npc.lastline
+  end
+  repeat
+   s=sub(talk.say,1,1)
+   if s!="|" and s!="" then
+    -- add letter
+    talk.said=talk.said..s
+    talk.say=sub(talk.say,2,#talk.say)
+   elseif not skip and (btnp(4) or btnp(5)) then
+    -- go to next line
+    printh("next!")
+    talk.said=""
+    
+    -- remove npc's old line
+    while #talk.npc.lines > 0 and sub(talk.npc.lines,1,1) != "|" do
+     talk.npc.lines=sub(talk.npc.lines,2,#talk.npc.lines)
+    end
+    talk.npc.lines=sub(talk.npc.lines,2,#talk.npc.lines)
+    
+    talk.say=sub(talk.say,2,#talk.say)
+   else
+    -- reached end of line
+    skip=false
+   end
+  until not skip
  end
 end
 
@@ -866,7 +959,7 @@ function _draw()
  
  if menu!=nil then
   draw_menu()
- elseif talk.offset > -32 then
+ elseif talk.offset > -talk.offset_target then
   camera(0,talk.offset)
   draw_duckface()
   draw_npcface()
@@ -1284,17 +1377,8 @@ function draw_npcface()
 end
 
 function draw_dialog()
- -- quack text
- if btn(4) then
-  print_ol("Ž • quack •",35,127-16,0,7)
- else
-  print_ol("Ž • quack •",35,127-16,7,0)
- end
- if btn(5) then
-  print_ol("— – quack – ",35,127-8,0,7)
- else 
-  print_ol("— – quack – ",35,127-8,7,0)
- end
+ print_ol(talk.npc.who,127-#talk.npc.who*4-32,127-32,0,7)
+ print_ol(talk.said,32,127-24,0,7)
 end
 
 function print_ol(s,x,y,c1,c2)
