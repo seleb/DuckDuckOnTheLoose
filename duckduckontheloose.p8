@@ -1198,23 +1198,28 @@ end
 function draw_title()
  local t=time()
  local t2=t
+ local c=2
+ if menu != 0 then
+  c=8
+  t2*=16
+ end
  for i=0,3 do
-  pal(0,(i+t2)%2+2)
+  pal(0,(i+t2)%c+c)
   sspr(40+8*i,16,8,11,12+12*i,10+sin(t+i/3)*1.2,16,22)
  end
  for i=0,3 do
-  pal(0,(i+t2+4)%2+2)
+  pal(0,(i+t2+4)%c+c)
   sspr(40+8*i,16,8,11,9+12*(i+4)+8,10+sin(t+(i+1)/3)*1.2,16,22)
  end
  local s=" on the"
  for i=1,#s do
-  pal(0,(i+t2)%2+2)
+  pal(0,(i+t2)%c+c)
   print_ol(sub(s,i,i),64+(i-1)*4-#s*2+2,35+sin(t/2+i/#s)+2,5,5)
   print_ol(sub(s,i,i),64+(i-1)*4-#s*2,35+sin(t/2+i/#s),7,0)
  end
  
  for i=0,4 do
-  pal(0,(i+t2)%2+2)
+  pal(0,(i+t2)%c+c)
   sspr(72+8*i,16,8,11,9+12*(i+2),44+sin(t+(i+2)/3)*1.2,16,22)
  end
  pal(0,0)
