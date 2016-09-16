@@ -162,6 +162,26 @@ function _init()
  p.quack_timer=0
  p.c={0,0,0}
  p.duck=-1
+ p.ducklings={}
+ 
+ ducklings={}
+ ducklings.height=3
+ ducklings.r=2
+ ducklings.found=0
+ ducklings.found_timer=0
+ 
+ add(ducklings,{
+  p={10,10},
+  found=false
+ })
+ add(ducklings,{
+  p={20,10},
+  found=false
+ })
+ add(ducklings,{
+  p={10,15},
+  found=false
+ })
  
  p.r=4 
  p.r2=p.r*p.r
@@ -558,7 +578,7 @@ function _update()
    btn(0) != btn(1) or
    btn(2) != btn(3)
   then
-   if stat(16) != p.cell.biome.foot_sfx then
+   if p.cell!= nil and stat(16) != p.cell.biome.foot_sfx then
     sfx(p.cell.biome.foot_sfx,0)
    end
   else
@@ -644,6 +664,7 @@ function _update()
  update_bushes()
  update_buildings()
  update_npcs()
+ update_ducklings()
  update_collision()
  
  
@@ -875,6 +896,31 @@ function update_npcs()
  end
 end
 
+function update_ducklings()
+ -- pick em up
+ for d in all(ducklings) do
+  if v_distm(d.p,p.p) < p.r then
+   d.target=p.ducklings[#p.ducklings] or p
+   add(p.ducklings,d)
+   del(ducklings,d)
+   ducklings.found+=1
+   ducklings.found_timer=80
+   sfx(8,3)
+  end
+ end
+ 
+ ducklings.found_timer=max(0,ducklings.found_timer-1)
+ 
+ 
+ 
+ -- follow the leader
+ for d in all(p.ducklings) do
+  local v=min(1,v_distm(d.p,d.target.p)/(p.r*2))*0.4
+  d.p=v_lerp(d.p,d.target.p,v*v)
+  d.a=-atan2(d.target.p[2]-d.p[2],d.target.p[1]-d.p[1])-0.25
+ end
+end
+
 function update_dialog()
  local prev=talk.npc
  talk.r=10000
@@ -968,6 +1014,7 @@ function _draw()
  
  draw_bushes(true)
  draw_npcs(true)
+ draw_ducklings(true)
  draw_player(true)
  draw_trees(true)
  draw_buildings(true)
@@ -975,12 +1022,30 @@ function _draw()
  
  draw_bushes(false)
  draw_npcs(false)
+ draw_ducklings(false)
  draw_player(false)
  draw_trees(false)
  draw_buildings(false)
  draw_clouds(false)
  
  --draw_debug()
+ 
+ if ducklings.found_timer > 0 then
+  local c=ducklings.found_timer/160
+  c=c*c*2
+  c=-(-sin(c))*128+64
+  --c=lerp(0,c,0.5)
+  camera(0,c)
+  for i=0,3 do
+   pal(0,(i+time()*16)%8+8)
+   sspr(40+i*8,16,8,11, 20+i*16,10+sin(time()+i/3)*1.2, 16,22)
+  end
+  for i=0,5 do
+   pal(0,(i+time()*16)%8+8)
+   sspr(80+i*8,112,8,11, 20+i*16,30+sin(time()+i/3)*1.2, 16,22)
+  end
+  pal(0,0)
+ end
  
  if menu!=nil then
   draw_menu()
@@ -1057,6 +1122,29 @@ function draw_footprints()
   
   circfill(f1[1],f1[2],1)
   circfill(f2[1],f2[2],1)
+ end
+end
+
+function draw_ducklings(shadow)
+ camera(cam.p[1],cam.p[2])
+ 
+ if shadow then
+  color(5)
+  for d in all(ducklings) do
+   circfill(d.p[1]+shadow_offset[1]*ducklings.height,d.p[2]+shadow_offset[1]*ducklings.height,ducklings.r+1)
+  end
+  for d in all(p.ducklings) do
+   circfill(d.p[1]+shadow_offset[1]*ducklings.height,d.p[2]+shadow_offset[1]*ducklings.height,ducklings.r+1)
+  end
+ else
+  for d in all(ducklings) do
+   circfill(d.p[1],d.p[2],ducklings.r,9)
+   circfill(d.p[1]+1,d.p[2]+1,1,10)
+  end
+  for d in all(p.ducklings) do
+   circfill(d.p[1],d.p[2],ducklings.r,9)
+   circfill(d.p[1]+cos(d.a),d.p[2]+sin(d.a),1,10)
+  end
  end
 end
 
@@ -1546,22 +1634,22 @@ eeeeeee8888eeeeeeeeeeee8888eeeeeeeeeeee8888eeeeeeeeeeee8888eeeeeeeeeeee8888eeeee
 eeeeeeaa88aaeeeeeeeeeeaa88aaeeeeeeeeeeaa88aaeeeeeeeeeeaa88aaeeeeeeeeeeaa88aaeeeeeeeeeeaa88aaeeeeeeeeeeaa88aaeeeeeeeeeeaa88aaeeee
 eeeeeeaaaaaaeeeeeeeeeeaaaaaaeeeeeeeeeeaaaaaaeeeeeeeeeeaaaaaaeeeeeeeeeeaaaaaaeeeeeeeeeeaaaaaaeeeeeeeeeeaaaaaaeeeeeeeeeeaaaaaaeeee
 eeeeeeaaaaaaeeeeeeeeeeaaaaaaeeeeeeeeeeaaaaaaeeeeeeeeeeaaaaaaeeeeeeeeeeaaaaaaeeeeeeeeeeaaaaaaeeeeeeeeeeaaaaaaeeeeeeeeeeaaaaaaeeee
-eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee
-eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee
-eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee
-eeeeee999999eeeeeeeeee999999eeeeeeeeee999999eeeeeeeeee999999eeeeeeeeee999999eeeeeeeeee999999eeeeeeeeee999999eeeeeeeeee999999eeee
-eeeee99888899eeeeeeee99888899eeeeeeee99888899eeeeeeee99888899eeeeeeee99888899eeeeeeee99888899eeeeeeee99888899eeeeeeee99888899eee
-eeeee98080889eeeeeeee98080889eeeeeeee98080889eeeeeeee98080889eeeeeeee98080889eeeeeeee98080889eeeeeeee98080889eeeeeeee98080889eee
-eeeee88080888eeeeeeee88080888eeeeeeee88080888eeeeeeee88080888eeeeeeee88080888eeeeeeee88080888eeeeeeee88080888eeeeeeee88080888eee
-eeeee88080888eeeeeeee88080888eeeeeeee88080888eeeeeeee88080888eeeeeeee88080888eeeeeeee88080888eeeeeeee88080888eeeeeeee88080888eee
-eeeee888888888eeeeeee888888888eeeeeee888888888eeeeeee888888888eeeeeee888888888eeeeeee888888888eeeeeee888888888eeeeeee888888888ee
-eeeee888888888eeeeeee888888888eeeeeee888888888eeeeeee888888888eeeeeee888888888eeeeeee888888888eeeeeee888888888eeeeeee888888888ee
-eeeee88000888eeeeeeee88000888eeeeeeee88000888eeeeeeee88000888eeeeeeee88000888eeeeeeee88000888eeeeeeee88000888eeeeeeee88000888eee
-eeeee88888888eeeeeeee88888888eeeeeeee88888888eeeeeeee88888888eeeeeeee88888888eeeeeeee88888888eeeeeeee88888888eeeeeeee88888888eee
-eeeeeee8888eeeeeeeeeeee8888eeeeeeeeeeee8888eeeeeeeeeeee8888eeeeeeeeeeee8888eeeeeeeeeeee8888eeeeeeeeeeee8888eeeeeeeeeeee8888eeeee
-eeeeeeaa88aaeeeeeeeeeeaa88aaeeeeeeeeeeaa88aaeeeeeeeeeeaa88aaeeeeeeeeeeaa88aaeeeeeeeeeeaa88aaeeeeeeeeeeaa88aaeeeeeeeeeeaa88aaeeee
-eeeeeeaaaaaaeeeeeeeeeeaaaaaaeeeeeeeeeeaaaaaaeeeeeeeeeeaaaaaaeeeeeeeeeeaaaaaaeeeeeeeeeeaaaaaaeeeeeeeeeeaaaaaaeeeeeeeeeeaaaaaaeeee
-eeeeeeaaaaaaeeeeeeeeeeaaaaaaeeeeeeeeeeaaaaaaeeeeeeeeeeaaaaaaeeeeeeeeeeaaaaaaeeeeeeeeeeaaaaaaeeeeeeeeeeaaaaaaeeeeeeeeeeaaaaaaeeee
+eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee7777777ee77777ee7777777e7777777e777777ee77777eee
+eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee700000757700077e70077075700770757000077e700075ee
+eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee7007777570077075700770757007707570077075700075ee
+eeeeee999999eeeeeeeeee999999eeeeeeeeee999999eeeeeeeeee999999eeeeeeeeee999999eeee7007555570077075700770757000707570077075700075ee
+eeeee99888899eeeeeeee99888899eeeeeeee99888899eeeeeeee99888899eeeeeeee99888899eee700777ee70077075700770757000707570077075770775ee
+eeeee98080889eeeeeeee98080889eeeeeeee98080889eeeeeeee98080889eeeeeeee98080889eee7000075e70077075700770757000007570077075777775ee
+eeeee88080888eeeeeeee88080888eeeeeeee88080888eeeeeeee88080888eeeeeeee88080888eee7007775e70077075700770757007007570077075700075ee
+eeeee88080888eeeeeeee88080888eeeeeeee88080888eeeeeeee88080888eeeeeeee88080888eee7007555e70077075700770757007707570077075700075ee
+eeeee888888888eeeeeee888888888eeeeeee888888888eeeeeee888888888eeeeeee888888888ee70075eee77000775770007757007707570000775700075ee
+eeeee888888888eeeeeee888888888eeeeeee888888888eeeeeee888888888eeeeeee888888888ee77775eeee7777755e77777557777777577777755777775ee
+eeeee88000888eeeeeeee88000888eeeeeeee88000888eeeeeeee88000888eeeeeeee88000888eeee5555eeeee55555eee55555ee5555555e555555ee55555ee
+eeeee88888888eeeeeeee88888888eeeeeeee88888888eeeeeeee88888888eeeeeeee88888888eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee
+eeeeeee8888eeeeeeeeeeee8888eeeeeeeeeeee8888eeeeeeeeeeee8888eeeeeeeeeeee8888eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee
+eeeeeeaa88aaeeeeeeeeeeaa88aaeeeeeeeeeeaa88aaeeeeeeeeeeaa88aaeeeeeeeeeeaa88aaeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee
+eeeeeeaaaaaaeeeeeeeeeeaaaaaaeeeeeeeeeeaaaaaaeeeeeeeeeeaaaaaaeeeeeeeeeeaaaaaaeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee
+eeeeeeaaaaaaeeeeeeeeeeaaaaaaeeeeeeeeeeaaaaaaeeeeeeeeeeaaaaaaeeeeeeeeeeaaaaaaeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee
 __gff__
 0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000
 0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000
@@ -1607,7 +1695,7 @@ __sfx__
 000100001117505171071710a1710e175122741827111271102711124114231232511d26124271292750000000000000000000000000000000000000000000000000000000000000000000000000000000000000
 000100000517505171071710a1710e175122741827111271102711124114231172511d26118271112750000000000000000000000000000000000000000000000000000000000000000000000000000000000000
 000400002b000360003b00036000120000d000090000700006010040100501007010090200b0300e03011030150401d050210502805030060370603d060000000000000000000000000000000000000000000000
-001000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000
+000900001b5151d5251b5251f0251b535220351b5352b04533550330613356133061335613355133551335413354133531335313352133521335113351533505335052650528505265052a505315053550537505
 001000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000
 0002000000000000000d0500a05009050080500000000000000000d0500d0500c0500905010000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000
 00020000000000000005050060500b050110500000000000000000405005050070501005010000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000
