@@ -147,7 +147,7 @@ function _init()
  
  --player
  p={}
- p.p=v_mul({0,0},32)
+ p.p=v_mul({5,5},32)
  p.v={0,0}
  p.speed={0.7,0.7}
  p.max_speed=3
@@ -160,12 +160,14 @@ function _init()
  p.stride_alt=false
  p.height=4
  p.quack_timer=0
+ p.c={0,0,0}
+ p.duck=-1
  
  p.r=4 
  p.r2=p.r*p.r
  -- camera
  cam={}
- cam.p=v_sub(p.p,{64,64+24})
+ cam.p=v_sub(p.p,{64,64+128})
  cam.c={0,0}
  cam.p_o=cam.p
  cam.offset={64,64}
@@ -293,7 +295,7 @@ function _init()
  	c1=4,c2=3,r=3,height=2},
  	{who="hen",spr=0,
  	mouth=-1,mouth_offset=0,
- 	c1=5,c2=4,r=3,height=2}
+ 	c1=6,c2=4,r=3,height=2}
  }
  
  for npc in all(npcs) do
@@ -308,7 +310,9 @@ function _init()
   npc.cell[1]=flr(rnd(6))
   npc.cell[2]=flr(rnd(6))
   
-  npc.lines="oh hey duck duck!|this is just some test dialog.|it's the same for every character!|i'm just gonna say this now.|"
+  npc.sfx=flr(rnd(2))+10
+  
+  npc.lines=npc.lines or "oh hey duck duck!|this is just some test dialog.|it's the same for every character!|i'm just gonna say this now.|"
   
   -- add breaks into lines
   -- (no word breaks)
@@ -350,11 +354,12 @@ function _init()
  
  talk={}
  talk.npc=nil
+ talk.bounce=0
  talk.say=""
  talk.said=""
- talk.offset=0
  talk.offset_target=40
-
+ talk.offset=-talk.offset_target
+ 
  menu=0
 end
 
@@ -524,6 +529,13 @@ function _update()
    if btnp(4) or btnp(5) then
     menu-=1
     sfx(7,3)
+    if btnp(4) then
+     p.c={4,10,3}
+     p.duck=4
+    else
+     p.c={6,10,4}
+     p.duck=5
+    end
    end
   else
    menu+=menu/4
@@ -565,9 +577,7 @@ function _update()
   p.quack_timer=10
  end
  
- if p.quack_timer>0 then
-  p.quack_timer-=1
- end
+ p.quack_timer=max(0,p.quack_timer-1)
  
  perspective_offset[1]=64+sin(time()/9)*4
  perspective_offset[2]=80+sin(time()/11)*4
@@ -599,7 +609,7 @@ function _update()
  -- camera
  cam.offset=v_add(v_mul(p.v,-15),{64,64})
  if menu!=nil then
-  cam.offset[2]+=24+menu/3
+  cam.offset[2]+=128+menu*1.5
  end
  
  cam.p_o=cam.p
@@ -650,7 +660,7 @@ function _update()
 end
 
 function update_footprints()
- 
+ if p.cell then
  if p.cell.biome.footprints then
   -- footprints
   local fa=p.a
@@ -675,6 +685,7 @@ function update_footprints()
    footprints[footprints.max]=fp
    p.stride_alt = not p.stride_alt
   end
+ end
  end
 end
 
@@ -878,9 +889,9 @@ function update_dialog()
  
  if prev!=talk.npc then
   if #talk.npc.lines > 0 then
-   talk.say=talk.npc.lines
+   talk.say="|"..talk.npc.lines
   else
-   talk.say=sub(talk.npc.lastline,2,#talk.npc.lastline)
+   talk.say="|"..sub(talk.npc.lastline,2,#talk.npc.lastline)
   end
   talk.said=""
   printh(talk.npc.who..": "..talk.say)
@@ -889,6 +900,12 @@ function update_dialog()
  -- transition view
  if talk.r==10000 then
   talk.offset=lerp(talk.offset,-talk.offset_target,0.25)
+  if abs(talk.offset-(-talk.offset_target)) < 1 then
+   talk.offset=-talk.offset_target
+   talk.npc=nil
+   talk.say=""
+   talk.said=""
+  end
  else
   talk.offset=lerp(talk.offset,0,0.25) 
  end
@@ -911,6 +928,12 @@ function update_dialog()
   repeat
    s=sub(talk.say,1,1)
    if s!="|" and s!="" then
+    
+    if stat(19) != talk.npc.sfx then
+     sfx(talk.npc.sfx,3)
+     talk.bounce=10
+    end
+    --sfx(5,2)
     -- add letter
     talk.said=talk.said..s
     talk.say=sub(talk.say,2,#talk.say)
@@ -932,6 +955,7 @@ function update_dialog()
    end
   until not skip
  end
+ talk.bounce=max(0,talk.bounce-1)
 end
 
 function _draw()
@@ -1051,10 +1075,10 @@ function draw_player(shadow)
    p1[2]+p.height*sin(p.a)*s
   }
   
-  circfill(p1[1],p1[2],p.r*3/4,4)
-  circfill(p2[1],p2[2],p.r/2,10)
+  circfill(p1[1],p1[2],p.r*3/4,p.c[1])
+  circfill(p2[1],p2[2],p.r/2,p.c[2])
   p2=v_lerp(p1,p2,0.75)
-  circfill(p2[1],p2[2],p.r/2,3)
+  circfill(p2[1],p2[2],p.r/2,p.c[3])
   p2=v_lerp(p1,p2,0.5)
   pset(p2[1],p2[2],0)
   end
@@ -1322,31 +1346,46 @@ end
 function draw_menu()
  camera(0,menu)
  draw_title()
- draw_duckface()
- talk.npc=npcs[15]
- draw_npcface()
  
+ local a=-abs(sin(time()/2))*3
+ a=flr(a)
+ 
+ -- drake
+ sx=64
+ if p.duck==4 then
+  sx+=16
+ end
+ sspr(sx,0,16,16,0,128-32-a,32,32+a)
+ sx=96
+ 
+ -- hen
+ if p.duck==5 then
+  sx+=16
+ end
+ sspr(sx,0,16,16,128-32,128-32-a,32,32+a,true)
+
  -- quack text
- if btn(4) then
-  print_ol("Ž • quack •",35,127-16,0,7)
+ if p.duck==4 then
+  print_ol("Ž",33,127-16,7,0)
  else
-  print_ol("Ž • quack •",35,127-16,7,0)
+  print_ol("Ž",33,127-16,0,7)
  end
- if btn(5) then
-  print_ol("— – quack – ",35,127-8,0,7)
- else 
-  print_ol("— – quack – ",35,127-8,7,0)
+ if p.duck==5 then
+  print_ol("—",97-8,127-16,7,0)
+ else
+  print_ol("—",97-8,127-16,0,7)
  end
+ print_ol("• quack •",43,127-16,0,7)
 end
 
 function draw_duckface()
  local t=p.quack_timer
- if menu!=nil then
-  t=0
- end
  local a=abs(sin(t/40))*5-abs(sin(time()/2))*3
  a=flr(a)
- sx=72
+ sx=64
+ if p.duck==5 then
+  sx+=32
+ end
  if t > 0 then
   sx+=16
  end
@@ -1354,9 +1393,8 @@ function draw_duckface()
 end
 
 function draw_npcface()
- local a=abs(sin(p.quack_timer/40))*5-abs(sin(time()/2))*3
- a=flr(a)
- sx=0
+ local a=abs(sin(talk.bounce/40))*5-abs(sin(time()/2))*3
+ a=flr(a)sx=0
  sy=32
  local npc=talk.npc
  sx+=npc.spr*16
@@ -1364,20 +1402,24 @@ function draw_npcface()
   sx-=128
   sy+=16
  end
+ 
  sspr(sx,sy,16,16,128-32,128-32-a,32,32+a)
  
  -- npc mouth
  if npc.mouth >= 0 then
-  if p.quack_timer > 0 and time()%0.2 > 0.1 then
+  local c=sub(talk.say,1,1)
+  if c!="|" and c!="" and time()%0.2 > 0.1 then
    pal(0,npc.mouth)
-   sspr(56,0,16,16,128-32,128-32-a+npc.mouth_offset,32,32+a)
+   sspr(56,0,8,16,128-20,128-32-a+npc.mouth_offset,16,32+a)
    pal(0,0)
   end
  end
 end
 
 function draw_dialog()
- print_ol(talk.npc.who,127-#talk.npc.who*4-32,127-32,0,7)
+ local a=abs(sin(talk.bounce/40))*5-abs(sin(time()/2))*3
+ a=flr(a)
+ print_ol(talk.npc.who,127-#talk.npc.who*4-2,127-39-a,0,7)
  print_ol(talk.said,32,127-24,0,7)
 end
 
@@ -1391,22 +1433,22 @@ function print_ol(s,x,y,c1,c2)
  print(s,x,y,c2)
 end
 __gfx__
-eeeeeeeeeeeeeeee00e000ee0e0eeeeeeee0eee0eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee777777eeeeeeeeee777777eeeeeeeeeeeeeeeeeeeeeeeeeeee
-eeeeeeeeee0eee0eeeeeeeee0e0e0eeee0eee0e0eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee77333377eeeeeeee77333377eeeeeeeeeeeeeeeeeeeeeeeeeee
-ee7ee7eeeeeeeeeee00e0e000eeeee0eeee0e0eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee73333337eeeeeeee73333337eeeeeeeeeeeeeeeeeeeeeeeeeee
-eee77eeee0e0e0e0eeeeeeee0e0e0eeeeeeeeee0eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee73333337eeeeeeee73333337eeeeeeeee999999eeeeeeeeeeee
-eee77eeeeeeeeeee0e0e0e0e0eeeeeeeeee0e0e0eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee73303307eeeeeeee73303307eeeeeeee99888899eeeeeeeeeee
-ee7ee7ee00e0e00eeeeeeeeeee0e0eeee0eeeee0eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee73303307eeeeeeee73303307eeeeeeee98080889eeeeeeeeeee
-eeeeeeeeeeeeeeeee0eee0eeee0eee0eeee0e0e0eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee73303307eeeeeeee7330330777eeeeee88080888eeeeeeeeeee
-eeeeeeee00000e00eeeeeeee0eee0eeeeeeee0e0eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee73333aa777eeeeee73333aaaa7eeeeee88080888eeeeeeeeeee
-eeeeeeeeeeeeeeee00e000000eeeeeeeeeeeeee0eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee7333aaaaa7eeeeee7333aaa777eeeeee888888888eeeeeeeeee
-eeeeeeeeeee0eeeeeeeeeeee0eee0eeeeeeee0e0eeeeeeeeeeeeeeeeeeeeeee000eeeeeeeeeee7333333777eeeeee73330037eeeeeeee888888888eeeeeeeeee
-eeeeeeeeeeeeeeeee0eee0ee0e0eeeeeeee0eeeeeeeeeeeeeeeeeeeeeeeeeee000eeeeee7777773333337eee777777333aa377eeeeeee88000888eeeeeeeeeee
-eeeeeeeee0eee0eeeeeeeeee0eeeee0eeeeeeee0eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee7444773333337eee7444773333aaa7eeeeeee88888888eeeeeeeeeee
-eeeeeeeeeeeeeeeeee0eee0e0eeeeeeee0eeeee0eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee4444443333337eee44444433333377eeeeeeeee8888eeeeeeeeeeeee
-eeeeeeeeee0eee0eeeeeeeeeeeee0eeeeeeee0e0eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee44444443333477ee44444443333477eeeeeeeeaa88aaeeeeeeeeeeee
-eeeeeeeeeeeeeeeeeeee0eee0e0eeeeeeee0eee0eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee44444444444447ee44444444444447eeeeeeeeaaaaaaeeeeeeeeeeee
-eeeeeeee00000e00eeeeeeee0eeeeeeeeeeeeee0eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee444444444444447e444444444444447eeeeeeeaaaaaaeeeeeeeeeeee
+eeeeeeeeeeeeeeee00e000ee0e0eeeeeeee0eee0eeeeeeeeeeeeeeeeeeeeeeeeeeeeee777777eeeeeeeeee777777eeeeeeeeee777777eeeeeeeeee777777eeee
+eeeeeeeeee0eee0eeeeeeeee0e0e0eeee0eee0e0eeeeeeeeeeeeeeeeeeeeeeeeeeeee77333377eeeeeeee77333377eeeeeeee77444477eeeeeeee77444477eee
+ee7ee7eeeeeeeeeee00e0e000eeeee0eeee0e0eeeeeeeeeeeeeeeeeeeeeeeeeeeeeee73333337eeeeeeee73333337eeeeeeee74444447eeeeeeee74444447eee
+eee77eeee0e0e0e0eeeeeeee0e0e0eeeeeeeeee0eeeeee999999eeeeeeeeeeeeeeeee73333337eeeeeeee73333337eeeeeeee74444447eeeeeeee74444447eee
+eee77eeeeeeeeeee0e0e0e0e0eeeeeeeeee0e0e0eeeee99888899eeeeeeeeeeeeeeee73303307eeeeeeee73303307eeeeeeee74404407eeeeeeee74404407eee
+ee7ee7ee00e0e00eeeeeeeeeee0e0eeee0eeeee0eeeee98080889eeeeeeeeeeeeeeee73303307eeeeeeee73303307eeeeeeee74404407eeeeeeee74404407eee
+eeeeeeeeeeeeeeeee0eee0eeee0eee0eeee0e0e0eeeee88080888eeeeeeeeeeeeeeee73303307eeeeeeee7330330777eeeeee74404407eeeeeeee7440440777e
+eeeeeeee00000e00eeeeeeee0eee0eeeeeeee0e0eeeee88080888eeeeeeeeeeeeeeee73333aa777eeeeee73333aaaa7eeeeee74444aa777eeeeee74444aaaa7e
+eeeeeeeeeeeeeeee00e000000eeeeeeeeeeeeee0eeeee888888888eeeeeeeeeeeeeee7333aaaaa7eeeeee7333aaa777eeeeee7444aaaaa7eeeeee7444aaa777e
+eeeeeeeeeee0eeeeeeeeeeee0eee0eeeeeeee0e0eeeee888888888eee000eeeeeeeee7333333777eeeeee73330037eeeeeeee7444444777eeeeee74440047eee
+eeeeeeeeeeeeeeeee0eee0ee0e0eeeeeeee0eeeeeeeee88000888eeee000eeee7777773333337eee777777333aa377ee7777774444447eee777777444aa477ee
+eeeeeeeee0eee0eeeeeeeeee0eeeee0eeeeeeee0eeeee88888888eeeeeeeeeee7444773333337eee7444773333aaa7ee7666774444447eee7666774444aaa7ee
+eeeeeeeeeeeeeeeeee0eee0e0eeeeeeee0eeeee0eeeeeee8888eeeeeeeeeeeee4444443333337eee44444433333377ee6666664444447eee66666644444477ee
+eeeeeeeeee0eee0eeeeeeeeeeeee0eeeeeeee0e0eeeeeeaa88aaeeeeeeeeeeee44444443333477ee44444443333477ee66666664444677ee66666664444677ee
+eeeeeeeeeeeeeeeeeeee0eee0e0eeeeeeee0eee0eeeeeeaaaaaaeeeeeeeeeeee44444444444447ee44444444444447ee66666666666667ee66666666666667ee
+eeeeeeee00000e00eeeeeeee0eeeeeeeeeeeeee0eeeeeeaaaaaaeeeeeeeeeeee444444444444447e444444444444447e666666666666667e666666666666667e
 eeeeeeeeeeeeeeee0ee0ee000eeeeeeeeeeee0e0777777ee7777777e7777777e7777777e7777eeeee77777eee77777eee777777e7777777eeeeeeeeeeeeeeeee
 eeeeeeeeeeeeee0eeeeeeeeeee0eee0eeee0eee07000077e70077075770000757007707570075eee7700077e7700077e7700007570000075eeeeeeeeeeeeeeee
 eeeeeeeeeeeeeeeee0ee0ee0eeeeeeeeeeeeeeee7007707570077075700777757007707570075eee70077075700770757007777570077775eeeeeeeeeeeeeeee
@@ -1434,11 +1476,11 @@ e777aa44447eeeeee777aa33337eeeeeeeeeeee7090997eeeeeee740404427eeeeee7ff0f0ffff7e
 e7aaaaa4447eeeeee7aaaaa3337eeeeeeeeeeee7090997eeeeeee744444447eeeeee7fffffffff7eeeee7ff0f0fff77eeeee7ffffffffaa7ee7000444444047e
 e7774444447eeeeee7773333337eeeeeeeeeee77aa9997eeeeeee744444447eeeeee7f66666ff77eeeee7fffffffff7eeeee7fffffffffa7ee7704444444047e
 eee7444444777777eee7333333777777eeeeee7aaaa99777eeeee740004427eeeeee7760006f77eeeeee78ffff0f8f7eeeee7ff222ffffa7eee774400044407e
-eee7444444775557eee7333333774447eeeeee7799999779eeeee744444477eeeeeee77ffff77eeeeeee7ff000fff77eeeee7ffffffffaa7eeee74444444407e
-eee7444444555555eee7333333444444eeeeee7999999999eeeee77666677eeeeeee7739553377eeeeee77ffffff77eeeeee7aaffffaaaa7eeee77044440077e
-ee77544445555555ee77433334444444eeeee77996699999eeeee75665557eeeeeee73339aa337eeeeee7777ff7777eeeeee7788ff88aa77eeeee766446677ee
-ee75555555555555ee74444444444444eeeee79966669999eeeee75655557eeeeeee7f335933f7eeeeeee7ccffcc7eeeeee77f888888fa7eeeeee76666667eee
-ee75555555555555ee74444444444444eeeee79666666999eeeee75555557eeeeeee7f335593f7eeeeeee7cccccc7eeeeee7ff888888ff7eeeeee72222227eee
+eee7444444776667eee7333333774447eeeeee7799999779eeeee744444477eeeeeee77ffff77eeeeeee7ff000fff77eeeee7ffffffffaa7eeee74444444407e
+eee7444444666666eee7333333444444eeeeee7999999999eeeee77666677eeeeeee7739553377eeeeee77ffffff77eeeeee7aaffffaaaa7eeee77044440077e
+ee77644446666666ee77433334444444eeeee77996699999eeeee75665557eeeeeee73339aa337eeeeee7777ff7777eeeeee7788ff88aa77eeeee766446677ee
+ee76666666666666ee74444444444444eeeee79966669999eeeee75655557eeeeeee7f335933f7eeeeeee7ccffcc7eeeeee77f888888fa7eeeeee76666667eee
+ee76666666666666ee74444444444444eeeee79666666999eeeee75555557eeeeeee7f335593f7eeeeeee7cccccc7eeeeee7ff888888ff7eeeeee72222227eee
 eeee777eeeee777eeeeeeeeeeeeeeeeeeeeee77777777eeeeee777eeeeeeeeeeeeeee777777777eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee7777eeeee
 eeee7077eee7707eeeeeee777777eeeeeeee77dddddd77eeeee74777777777eeeeee77555555577eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee7777bb777eee
 eeee74477777447eeeeee77ffff77eeeeeee7ddffffdd7eeeee744444444477eeeee75555555557eeee7777eee77777eeeeee77777777eeeeeee737bbbb37eee
@@ -1561,13 +1603,13 @@ __sfx__
 000300062a615136011b6010960108601046050160100601006010060100601006010060100601006010060100601006010060100601006010060100601006010060100601006010060100601006010060100601
 00030006016140561507604076050560401605016010060100601006010060100601006010060100601006010d001006010060100601006010060100601006010060100601006010060100601006010060100601
 001000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000
-010100001117505171071710a1710e175122741827111271102711124114231232511d26124271292750000000000000000000000000000000000000000000000000000000000000000000000000000000000000
-010100000517505171071710a1710e175122741827111271102711124114231172511d26118271112750000000000000000000000000000000000000000000000000000000000000000000000000000000000000
+000100001117505171071710a1710e175122741827111271102711124114231232511d26124271292750000000000000000000000000000000000000000000000000000000000000000000000000000000000000
+000100000517505171071710a1710e175122741827111271102711124114231172511d26118271112750000000000000000000000000000000000000000000000000000000000000000000000000000000000000
 000400002b000360003b00036000120000d000090000700006010040100501007010090200b0300e03011030150401d050210502805030060370603d060000000000000000000000000000000000000000000000
 001000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000
 001000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000
-001000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000
-001000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000
+0002000000000000000d0500a05009050080500000000000000000d0500d0500c0500905010000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000
+00020000000000000005050060500b050110500000000000000000405005050070501005010000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000
 001000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000
 001000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000
 001000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000
