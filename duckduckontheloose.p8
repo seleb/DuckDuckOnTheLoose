@@ -329,7 +329,7 @@ function _init()
    
    -- word ends
    if c==" " or c=="\n" or c=="|" or #l==0 then
-    if #word+lw>=16 then
+    if #word+lw>16 then
      npc.lines=npc.lines.."\n"
      lw=0
     end
