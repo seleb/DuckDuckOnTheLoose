@@ -301,13 +301,14 @@ function _init()
  	{who="hipster",spr=12,
  	mouth=0,mouth_offset=0,
  	c1=13,c2=15,r=3,height=4},
- 	{who="thumbs up",spr=11,
+ 	{who="tommy tim-tom",spr=11,
  	mouth=0,mouth_offset=0,
- 	c1=1,c2=15,r=4,height=4},
+ 	c1=1,c2=15,r=4,height=4,
+  lines="duck duck, buddy!|how's it going?|on an adventure, i see!|i know how that goes...|but that life's not for ol' tommy!|leave the adventurin' to the birds, i always say!|speaking of birds...|what's up with those ducklings?|i saw one headed out west earlier...|course i didn't follow!|birds know best, as i always say!|or is it \"birds know west\"?|...|well, i'll let you get back to it...|best o' luck duck duck!|"},
  	{who="swimmer",spr=10,
  	mouth=0,mouth_offset=-4,
  	c1=10,c2=13,r=4,height=3,
- 	lines="oh! duck duck!|what a great day for a swim.|wouldn't you agree?|i've been doing calisthenics here every day.|i feel so much better for it!|so full of energy!|swimming is such great exercise.|though i'm sure you already knew that! ha ha!|...|my friends think i'm crazy for doing this.|they say it's dangerous to be out here alone.|they keep telling me but i just ignore them.|it's like water off a duck's back!|ha ha!|...|thanks for the visit...|but i should get back to excercising.|see you around duck duck!|"},
+ 	lines="oh! duck duck!|what a great day for a swim.|wouldn't you agree?|i've been doing calisthenics here every day.|i feel so much better for it!|so full of energy!|swimming is such great exercise.|though i'm sure you already knew that! ha ha!|...|my friends think i'm crazy for doing this.|they say it's dangerous to be out here alone.|they keep telling me but i just ignore them.|it's like water off a duck's back!|ha ha!|...|thanks for the visit...|but i should get back to exercising.|see you around duck duck!|"},
  	{who="bouncer",spr=9,
  	mouth=0,mouth_offset=-4,
  	c1=9,c2=15,r=4,height=4},
@@ -326,9 +327,10 @@ function _init()
  	{who="ranger",spr=4,
  	mouth=0,mouth_offset=0,
  	c1=3,c2=15,r=4,height=4},
- 	{who="scarf mcgee",spr=3,
+ 	{who="scarves mcgee",spr=3,
  	mouth=0,mouth_offset=0,
- 	c1=5,c2=4,r=4,height=4}
+ 	c1=5,c2=4,r=4,height=4,
+  lines="hello duck duck!|how are you today?|i'm taking a personal day...|get me some me time, you know?|oh, speaking of which...|i saw a couple ducklings strolling through town.|looked like they were making a day of it!|anyway, nice catching up with you.|make sure to hit me up next time you're in town!|...|...|...i wonder if i should get a new scarf...|"}
  }
  
  for npc in all(npcs) do
