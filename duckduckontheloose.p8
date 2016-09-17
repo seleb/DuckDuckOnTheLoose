@@ -171,16 +171,25 @@ function _init()
  ducklings.found_timer=0
  
  add(ducklings,{
-  p={10,10},
-  found=false
+  p={10,10}
  })
  add(ducklings,{
-  p={20,10},
-  found=false
+  p={20,20}
  })
  add(ducklings,{
-  p={10,15},
-  found=false
+  p={30,30}
+ })
+ add(ducklings,{
+  p={40,40}
+ })
+ add(ducklings,{
+  p={50,50}
+ })
+ add(ducklings,{
+  p={60,60}
+ })
+ add(ducklings,{
+  p={70,70}
  })
  
  p.r=4 
@@ -268,6 +277,18 @@ function _init()
  
  -- npc sprite
  npcs={
+ 	{who="drake",spr=1,
+ 	mouth=-1,mouth_offset=0,
+ 	c1=4,c2=3,r=3,height=2,
+ 	lines="duck duck! we need your help!|we lost our babies!!!!!|we had eight before, but now we only have one!|i don't know what happened to the rest!|i'm staying here to keep track of the last one.|please find the other seven!|we're counting on you\nduck duck!|"},
+ 	{who="hen",spr=0,
+ 	mouth=-1,mouth_offset=0,
+ 	c1=6,c2=4,r=3,height=2,
+ 	lines="duck duck! you need to find our babies!|we lost them!!!!!|one's still here, but there are seven on the loose!|you've got to find them!|don't let us down duck duck!|"},
+ 	{who="duckling",spr=2,
+ 	mouth=-1,mouth_offset=0,
+ 	c1=9,c2=10,r=2,height=2,
+ 	lines="hi duck duck!|are you going to find my brothers and sisters?|they're hiding somewhere around here...|i'll let you know if i see them!|good luck duck duck!|"},
  	{who="dumb alien",spr=15,
  	mouth=10,mouth_offset=-4,
  	c1=0,c2=11,r=4,height=4},
@@ -307,16 +328,7 @@ function _init()
  	c1=3,c2=15,r=4,height=4},
  	{who="scarf mcgee",spr=3,
  	mouth=0,mouth_offset=0,
- 	c1=5,c2=4,r=4,height=4},
- 	{who="duckling",spr=2,
- 	mouth=-1,mouth_offset=0,
- 	c1=9,c2=10,r=2,height=2},
- 	{who="drake",spr=1,
- 	mouth=-1,mouth_offset=0,
- 	c1=4,c2=3,r=3,height=2},
- 	{who="hen",spr=0,
- 	mouth=-1,mouth_offset=0,
- 	c1=6,c2=4,r=3,height=2}
+ 	c1=5,c2=4,r=4,height=4}
  }
  
  for npc in all(npcs) do
@@ -905,6 +917,26 @@ function update_ducklings()
    del(ducklings,d)
    ducklings.found+=1
    ducklings.found_timer=80
+   
+   if ducklings.found==7 then
+    npcs[1].lines="duck duck!|you found\nthem all!|ha ha, it looks\nlike they're not\ndone exploring\nthough!|feel free to\nbabysit them\nfor now.|just be sure you\ndon't lose them!|thanks again\nduck duck!|"
+    npcs[2].lines="duck duck!|you found\nthem all!|um...|would you mind\nlooking after\nthem for a bit?|it's just...\nthey're having\nso much fun!|you could take\nthem exploring!|you're great with\nkids, duck duck!|thank you\nso much!|"
+    npcs[1].lastline="|thanks again\nduck duck!|"
+    npcs[2].lastline="|thank you\nso much!|"
+    npcs[3].lines="oh, you found\nthem all\nduck duck!|next time we\nplay hide and\nseek i'll try\nharder...|"
+    npcs[3].lastline="|next time we\nplay hide and\nseek i'll try\nharder...|"
+   elseif ducklings.found==1 then
+    npcs[1].lines="you found one!|but where are\nthe others?|you've got to\nfind them\nduck duck!!|please find\nour babies!|"
+    npcs[2].lines="you found one!|but where are\nthe others?|you've got to\nfind them\nduck duck!!|please find\nour babies!|"
+    npcs[1].lastline="|please find\nour babies!|"
+    npcs[2].lastline="|please find\nour babies!|"
+   else
+    npcs[1].lines="duck duck!|you found "..#p.ducklings.."\nducklings, but\nthere's still "..(7-#p.ducklings).."\nleft out there!|please find them!|"
+    npcs[2].lines="duck duck!|you found "..#p.ducklings.."\nducklings, but\nthere's still "..(7-#p.ducklings).."\nleft out there!|please find them!|"
+    npcs[1].lastline="|please find them!|"
+    npcs[2].lastline="|please find them!|"
+   end
+   
    sfx(8,3)
   end
  end
