@@ -352,10 +352,13 @@ function _init()
   --npc.r=rnd(3)+2
   npc.r2=npc.r*npc.r
   --npc.height=6
-  npc.cell={flr(rnd(cells.bounds[1])),flr(rnd(cells.bounds[2]))}
   
-  npc.cell[1]=flr(rnd"6")
-  npc.cell[2]=flr(rnd"6")
+  if npc.cell==nil then
+   npc.cell={flr(rnd(cells.bounds[1])),flr(rnd(cells.bounds[2]))}
+  
+   npc.cell[1]=flr(rnd"6")
+   npc.cell[2]=flr(rnd"6")
+  end
   
   npc.sfx=flr(rnd"2")+10
   
@@ -994,7 +997,11 @@ function update_dialog()
    talk.said=""
   end
  else
-  talk.offset=lerp(talk.offset,0,0.25) 
+  if abs(talk.offset) < 1 then
+   talk.offset=0
+  else
+   talk.offset=lerp(talk.offset,0,0.25) 
+  end
  end
  
  
@@ -1006,7 +1013,6 @@ function update_dialog()
   skip = false
  else
  end
- 
  -- handle text
  if talk.npc!=nil then
   if #talk.say <= 1 then
@@ -1024,7 +1030,7 @@ function update_dialog()
     -- add letter
     talk.said=talk.said..s
     talk.say=sub(talk.say,2,#talk.say)
-   elseif not skip and (btnp"4" or btnp"5") then
+   elseif talk.offset==0 and not skip and (btnp"4" or btnp"5") then
     -- go to next line
     talk.said=""
     
