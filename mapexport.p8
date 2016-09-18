@@ -21,12 +21,26 @@ function val(x,y)
  return s
 end
 
-for y=0,127 do
+printh("gfx:\n","map.txt",true)
+for y=0,63 do
 s=""
 for x=0,127 do
 s=s..val(x,y)
 end
-printh(s)
+printh(s,"map.txt")
+end
+
+printh("\nmap:\n","map.txt")
+
+for y=64,127,2 do
+s=""
+for x=0,127,2 do
+s=s..val(x+1,y+1)..val(x,y)
+end
+for x=0,127,2 do
+s=s..val(x+1,y)..val(x,y)
+end
+printh(s,"map.txt")
 end
 __gfx__
 55555555555555111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111
