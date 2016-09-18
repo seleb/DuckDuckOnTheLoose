@@ -125,7 +125,7 @@ function _init()
  
  clouds={}
  clouds.a={}
- clouds.height_range={32,64}
+ clouds.height_range={45,50}
  clouds.count_range={20,40}
  clouds.radius_range={5,15}
  clouds.cluster_range={5,7}
