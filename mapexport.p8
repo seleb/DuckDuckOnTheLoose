@@ -3,36 +3,25 @@ version 8
 __lua__
 function hex(num)
  if num>9 then
- if num==10 then
-  num="a"
- elseif num==11 then
-  num="b"
- elseif num==12 then
-  num="c"
- elseif num==13 then
-  num="d"
- elseif num==14 then
-  num="e"
- elseif num==15 then
-  num="f"
- end
+  num-=9
+  num=sub("abcdef",num,num)
  end
  return num
 end
-function val(x,y)
- local s=sget(x,y)
- return hex(s)
-end
 
+cls()
+print("reading")
 
+-- read the spritesheet
+-- to a string (in hex)
 s=""
 for y=0,127 do
 for x=0,127 do
-s=s..val(x,y)
+s=s..hex(sget(x,y))
 end
 end
 
-printh("map:","map.txt",true)
+printh("map:\n","map.txt",true)
 printh(s,"map.txt")
 
 -- rle
@@ -40,7 +29,8 @@ printh(s,"map.txt")
 -- for simplicity (ie avoid delimiters)
 -- max of 15 repeats per character
 -- so "3fb2" is "fff22222222222"
-printh("rle:","map.txt")
+printh("\n\nrle:\n","map.txt")
+print("compressing")
 rle=""
 local count=0
 local char=sub(s,1,1)
@@ -57,34 +47,16 @@ repeat
 until #s==0
 printh(rle,"map.txt")
 
-printh("rle as map:","map.txt")
+-- print the rle version
+-- with linebreaks matching
+-- a .p8 file's map section
+printh("\n\nrle as map:\n","map.txt")
+print("converting")
 while #rle > 0 do
  printh(sub(rle,1,256),"map.txt")
  rle=sub(rle,257,#rle)
 end
-
---[[
-printh("gfx:\n","map.txt",true)
-for y=0,63 do
-s=""
-for x=0,127 do
-s=s..val(x,y)
-end
-printh(s,"map.txt")
-end
-
-printh("\nmap:\n","map.txt")
-
-for y=64,127,2 do
-s=""
-for x=0,127,2 do
-s=s..val(x+1,y)..val(x,y)
-end
-for x=0,127,2 do
-s=s..val(x+1,y+1)..val(x,y+1)
-end
-printh(s,"map.txt")
-end]]
+print("done!")
 __gfx__
 11111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111
 111111111111111111111cccccccccccccccccc1111111111cccccccccccccccccccccccccccccccccccccc11111cccccccccccccccccccccccccccccccccc11

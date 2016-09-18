@@ -1,8 +1,6 @@
 pico-8 cartridge // http://www.pico-8.com
 version 8
 __lua__
-
-
 --math
 function range(v)
  return rnd(max(0,v[2]-v[1]))+v[1]
@@ -19,10 +17,6 @@ function ease(t)
  else
   return 4*t*t*t
  end
-end
-
-function fract(v)
- return v-flr(abs(v))*sgn(v)
 end
 
 function v_add(a,b)
@@ -64,23 +58,11 @@ function v_distm(a,b)
 end
 function hex(num)
  if num>9 then
- if num==10 then
-  num="a"
- elseif num==11 then
-  num="b"
- elseif num==12 then
-  num="c"
- elseif num==13 then
-  num="d"
- elseif num==14 then
-  num="e"
- elseif num==15 then
-  num="f"
- end
+  num-=9
+  num=sub("abcdef",num,num)
  end
  return num
 end
-
 
 function add_biome(
  colour,tree_range,bush_props,transition,footprints)
@@ -96,7 +78,7 @@ function add_biome(
 end
 
 function _init()
- srand(200) --for testing
+ srand"4"
  seed=rnd()
  palt(0,false)
  palt(14,true)
@@ -131,7 +113,7 @@ function _init()
  add_biome(7,{0,0.1},{0.1,0,{}},true,{true,3})
  add_biome(11,{0.1,0.3},{0.5,0.8,{8,12,13,10}},true,{true,0})
  add_biome(15,{0,0.2},{0.2,0.2,{11,13}},true,{true,3})
- 
+
  add_biome(10,{0,0},{0,0,{}},true,{true,3})
  biomes[10].building_freq=0.8
  biomes[15].building_freq=0.01
@@ -372,10 +354,10 @@ function _init()
   --npc.height=6
   npc.cell={flr(rnd(cells.bounds[1])),flr(rnd(cells.bounds[2]))}
   
-  npc.cell[1]=flr(rnd(6))
-  npc.cell[2]=flr(rnd(6))
+  npc.cell[1]=flr(rnd"6")
+  npc.cell[2]=flr(rnd"6")
   
-  npc.sfx=flr(rnd(2))+10
+  npc.sfx=flr(rnd"2")+10
   
   npc.lines=npc.lines or "oh hey duck duck!|this is just some test dialog.|it's the same for every character!|i'm just gonna say this now.|"
   
@@ -591,10 +573,10 @@ function _update()
  if menu != nil then
   -- menu transition
   if menu==0 then
-   if btnp(4) or btnp(5) then
+   if btnp"4" or btnp"5" then
     menu-=1
     sfx(7,3)
-    if btnp(4) then
+    if btnp"4" then
      p.c={4,10,3}
      p.duck=4
     else
@@ -612,17 +594,17 @@ function _update()
  else
   
   -- movement
-  if btn(0) then v_dif[1] -= p.speed[1] end
-  if btn(1) then v_dif[1] += p.speed[1] end
-  if btn(2) then v_dif[2] -= p.speed[2] end
-  if btn(3) then v_dif[2] += p.speed[2] end
+  if btn"0" then v_dif[1] -= p.speed[1] end
+  if btn"1" then v_dif[1] += p.speed[1] end
+  if btn"2" then v_dif[2] -= p.speed[2] end
+  if btn"3" then v_dif[2] += p.speed[2] end
   
   -- footstep sfx
   if
-   btn(0) != btn(1) or
-   btn(2) != btn(3)
+   btn"0" != btn"1" or
+   btn"2" != btn"3"
   then
-   if p.cell!= nil and stat(16) != p.cell.biome.foot_sfx then
+   if p.cell!= nil and stat"16" != p.cell.biome.foot_sfx then
     sfx(p.cell.biome.foot_sfx,0)
    end
   else
@@ -634,10 +616,10 @@ function _update()
  
  
  -- quack
- if btnp(4) then
+ if btnp"4" then
   sfx(5,2)
   p.quack_timer=10
- elseif btnp(5) then
+ elseif btnp"5" then
   sfx(6,2)
   p.quack_timer=10
  end
@@ -913,14 +895,6 @@ end
 
 function update_npcs()
  for npc in all(npcs) do
-  --npc.p={64,64}
-  --npc.id=5
-  --npc.r=4
-  --npc.height=6
-  --npc.c1=8
-  --npc.c2=10
-  
-  --local p=v_add(npc.cell, cells.current)
   npc.p2={npc.cell[1],npc.cell[2]}
   
   if v_distm(npc.p2,v_add(cells.current,{2,2})) <= 4 then
@@ -987,6 +961,7 @@ end
 
 function update_dialog()
  local prev=talk.npc
+ -- find closest npc in range
  talk.r=10000
  for npc in all(npcs) do
   if npc.active then
@@ -998,14 +973,15 @@ function update_dialog()
   end
  end
  
+ -- if it's a new npc
+ -- get their lines
  if prev!=talk.npc then
   if #talk.npc.lines > 0 then
    talk.say="|"..talk.npc.lines
   else
-   talk.say="|"..sub(talk.npc.lastline,2,#talk.npc.lastline)
+   talk.say=talk.npc.lastline
   end
   talk.said=""
-  printh(talk.npc.who..": "..talk.say)
  end
  
  -- transition view
@@ -1023,7 +999,7 @@ function update_dialog()
  
  
  local s=sub(talk.say,1,1)
- local skip=btnp(4) or btnp(5)
+ local skip=btnp"4" or btnp"5"
  
  --skip only applied mid-line
  if s=="|" then
@@ -1040,17 +1016,16 @@ function update_dialog()
    s=sub(talk.say,1,1)
    if s!="|" and s!="" then
     
-    if stat(19) != talk.npc.sfx then
+    if stat"19" != talk.npc.sfx then
      sfx(talk.npc.sfx,3)
      talk.bounce=10
     end
-    --sfx(5,2)
+    
     -- add letter
     talk.said=talk.said..s
     talk.say=sub(talk.say,2,#talk.say)
-   elseif not skip and (btnp(4) or btnp(5)) then
+   elseif not skip and (btnp"4" or btnp"5") then
     -- go to next line
-    printh("next!")
     talk.said=""
     
     -- remove npc's old line
@@ -1076,39 +1051,26 @@ function _draw()
  
  draw_footprints()
  
- draw_bushes(true)
- draw_ducklings(true)
- draw_npcs(true)
- draw_player(true)
- draw_trees(true)
- draw_buildings(true)
- draw_clouds(true) 
+ draw_bushes"1"
+ draw_ducklings"1"
+ draw_npcs"1"
+ draw_player"1"
+ draw_trees"1"
+ draw_buildings"1"
+ draw_clouds"1" 
  
- draw_bushes(false)
- draw_ducklings(false)
- draw_npcs(false)
- draw_player(false)
- draw_trees(false)
- draw_buildings(false)
- draw_clouds(false)
+ draw_bushes()
+ draw_ducklings()
+ draw_npcs()
+ draw_player()
+ draw_trees()
+ draw_buildings()
+ draw_clouds()
  
  --draw_debug()
  
  if ducklings.found_timer > 0 then
-  local c=ducklings.found_timer/160
-  c=c*c*2
-  c=-(-sin(c))*128+64
-  --c=lerp(0,c,0.5)
-  camera(0,c)
-  for i=0,3 do
-   pal(0,(i+time()*16)%8+8)
-   sspr(40+i*8,16,8,11, 20+i*16,10+sin(time()+i/3)*1.2, 16,22)
-  end
-  for i=0,5 do
-   pal(0,(i+time()*16)%8+8)
-   sspr(80+i*8,112,8,11, 20+i*16,30+sin(time()+i/3)*1.2, 16,22)
-  end
-  pal(0,0)
+  draw_found()
  end
  
  if menu!=nil then
@@ -1142,28 +1104,28 @@ function draw_bg()
  if c!=cell.c then
   pal(0,c)
   for v=0,cells.h/8 do
-   spr(4+flr(rnd(4))*16,x+cells.w-8, y+v*8)
+   spr(4+flr(rnd"4")*16,x+cells.w-8, y+v*8)
   end
  end
  c=cell.edges[-1][0]
  if c!=cell.c then
   pal(0,c)
   for v=0,cells.h/8 do
-   spr(3+flr(rnd(4))*16,x, y+v*8)
+   spr(3+flr(rnd"4")*16,x, y+v*8)
   end
  end
  c=cell.edges[0][-1]
  if c!=cell.c then
   pal(0,c)
   for u=0,cells.w/8 do
-   spr(2+flr(rnd(4))*16,x+u*8, y)
+   spr(2+flr(rnd"4")*16,x+u*8, y)
   end
  end
  c=cell.edges[0][1]
  if c!=cell.c then
   pal(0,c)
   for u=0,cells.w/8 do
-   spr(1+flr(rnd(4))*16,x+u*8, y+cells.h-8)
+   spr(1+flr(rnd"4")*16,x+u*8, y+cells.h-8)
   end
  end
  
@@ -1176,7 +1138,7 @@ function draw_bg()
 end
 
 function draw_footprints()
- color(5)
+ color"5"
  for f=2,#footprints,2 do
   local f1=footprints[f-1]
   local f2=footprints[f]
@@ -1193,7 +1155,7 @@ function draw_ducklings(shadow)
  camera(cam.p[1],cam.p[2])
  
  if shadow then
-  color(5)
+  color"5"
   for d in all(ducklings) do
    circfill(d.p[1]+shadow_offset[1]*ducklings.height,d.p[2]+shadow_offset[1]*ducklings.height,ducklings.r+1)
   end
@@ -1249,7 +1211,7 @@ function draw_trees(shadows)
  
  if shadows then
  -- shadows
- color(5)
+ color"5"
  for t in all(trees) do
   circfill(
   t.p[1]+shadow_offset[1]*t.height/2,
@@ -1258,7 +1220,7 @@ function draw_trees(shadows)
  end
  else
  -- trunks
- color(4)
+ color"4"
  for t in all(trees) do
   for x=-1,1 do
   for y=-1,1 do
@@ -1297,7 +1259,7 @@ function draw_buildings(shadows)
  )
  
  if shadows then
- color(5)
+ color"5"
  for i=0,b.height/2,4 do
   local t={b.s[1],b.s[2]}
   t=v_mul(t,i*height_mult)
@@ -1305,7 +1267,7 @@ function draw_buildings(shadows)
   rectfill(t[1]-b.size[1],t[2]-b.size[2],t[1]+b.size[1],t[2]+b.size[2])
  end
  else
-  color(5)
+  color"5"
   for i=b.height/2,b.height-1,4 do
    local t={b.s[1],b.s[2]}
    t=v_mul(t,i*height_mult)
@@ -1324,14 +1286,14 @@ function draw_buildings(shadows)
 end
 
 function draw_clouds(shadows)
- camera(0,0)
+ camera""
  if shadows then
-  color(5)
+  color"5"
   for c in all(clouds.a) do
    circfill(c.ps[1],c.ps[2],c.r)
   end
  else
-  color(7)
+  color"7"
   for c in all(clouds.a) do
    circfill(c.s[1],c.s[2],c.r)
   end
@@ -1349,7 +1311,7 @@ function draw_bushes(shadows)
  )
  
  if shadows then
-  color(5)
+  color"5"
   for b in all(bushes) do
    circfill(
    b.p[1]+shadow_offset[1]*b.height,
@@ -1357,7 +1319,7 @@ function draw_bushes(shadows)
    b.r)
   end
  else
-  color(3)
+  color"3"
   for b in all(bushes) do
    circfill(b.s[1],b.s[2],b.r)
   end
@@ -1405,15 +1367,15 @@ function draw_debug()
  local cell=cells.a[x-cells.current[1]][y-cells.current[2]]
  
  if x==cells.current[1] and y==cells.current[2] then
-  color(10)
+  color"10"
  elseif
   x>=cells.bounds[1] or
   y>=cells.bounds[2] or
   x<=-1 or
   y<=-1 then
-  color(8)
+  color"8"
  else
-  color(6)
+  color"6"
  end
  rect(
  x*cells.w+1,
@@ -1436,14 +1398,14 @@ function draw_debug()
  
  for b in all(blobs) do
   if b.hit then
-   color(8)
+   color"8"
   else
-   color(6)
+   color"6"
   end
   circ(b.p[1],b.p[2],b.r)
  end
  
- color(6)
+ color"6"
  circ(p.p[1],p.p[2],p.r)
  line(p.p[1],p.p[2],
  p.p[1]+p.r*cos(p.a),
@@ -1453,7 +1415,7 @@ function draw_debug()
  
  
  
- camera(0,0)
+ camera""
  
  print_ol("mem:"..stat(0)/1024,1,1,0,7)
  print_ol("cpu:"..stat(1),1,7,0,7)
@@ -1574,6 +1536,22 @@ function draw_dialog()
  a=flr(a)
  print_ol(talk.npc.who,127-#talk.npc.who*4-2,127-39-a,0,7)
  print_ol(talk.said,32,127-24,0,7)
+end
+
+function draw_found()
+ local c=ducklings.found_timer/160
+ c=c*c*2
+ c=-(-sin(c))*128+64
+ camera(0,c)
+ for i=0,3 do
+  pal(0,(i+time()*16)%8+8)
+  sspr(40+i*8,16,8,11, 20+i*16,10+sin(time()+i/3)*1.2, 16,22)
+ end
+ for i=0,5 do
+  pal(0,(i+time()*16)%8+8)
+  sspr(80+i*8,112,8,11, 20+i*16,30+sin(time()+i/3)*1.2, 16,22)
+ end
+ pal(0,0)
 end
 
 function print_ol(s,x,y,c1,c2)
