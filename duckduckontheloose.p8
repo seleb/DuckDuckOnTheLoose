@@ -622,9 +622,13 @@ function _update()
  if btnp"4" then
   sfx(5,2)
   p.quack_timer=10
+  cam.p[1]-=cos(p.a)*2
+  cam.p[2]-=sin(p.a)*2
  elseif btnp"5" then
   sfx(6,2)
   p.quack_timer=10
+  cam.p[1]-=cos(p.a)*2
+  cam.p[2]-=sin(p.a)*2
  end
  
  p.quack_timer=max(0,p.quack_timer-1)
