@@ -1,26 +1,69 @@
 pico-8 cartridge // http://www.pico-8.com
 version 8
 __lua__
+function hex(num)
+ if num>9 then
+ if num==10 then
+  num="a"
+ elseif num==11 then
+  num="b"
+ elseif num==12 then
+  num="c"
+ elseif num==13 then
+  num="d"
+ elseif num==14 then
+  num="e"
+ elseif num==15 then
+  num="f"
+ end
+ end
+ return num
+end
 function val(x,y)
  local s=sget(x,y)
- if s>9 then
- if s==10 then
-  s="a"
- elseif s==11 then
-  s="b"
- elseif s==12 then
-  s="c"
- elseif s==13 then
-  s="d"
- elseif s==14 then
-  s="e"
- elseif s==15 then
-  s="f"
- end
- end
- return s
+ return hex(s)
 end
 
+
+s=""
+for y=0,127 do
+for x=0,127 do
+s=s..val(x,y)
+end
+end
+
+printh("map:","map.txt",true)
+printh(s,"map.txt")
+
+-- rle
+-- compress repeated characters
+-- for simplicity (ie avoid delimiters)
+-- max of 15 repeats per character
+-- so "3fb2" is "fff22222222222"
+printh("rle:","map.txt")
+rle=""
+local count=0
+local char=sub(s,1,1)
+repeat
+ c=sub(s,1,1)
+ if char==c and count<15 then
+  count+=1
+ else
+  rle=rle..hex(count)..char
+  count=1
+  char=c
+ end
+ s=sub(s,2,#s)
+until #s==0
+printh(rle,"map.txt")
+
+printh("rle as map:","map.txt")
+while #rle > 0 do
+ printh(sub(rle,1,256),"map.txt")
+ rle=sub(rle,257,#rle)
+end
+
+--[[
 printh("gfx:\n","map.txt",true)
 for y=0,63 do
 s=""
@@ -35,36 +78,36 @@ printh("\nmap:\n","map.txt")
 for y=64,127,2 do
 s=""
 for x=0,127,2 do
-s=s..val(x+1,y+1)..val(x,y)
-end
-for x=0,127,2 do
 s=s..val(x+1,y)..val(x,y)
 end
-printh(s,"map.txt")
+for x=0,127,2 do
+s=s..val(x+1,y+1)..val(x,y+1)
 end
+printh(s,"map.txt")
+end]]
 __gfx__
-55555555555555111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111
-500011122233351111111cccccccccccccccccc1111111111cccccccccccccccccccccccccccccccccccccc11111cccccccccccccccccccccccccccccccccc11
-50001112223335c111ccccccccccccccccccccccccccccccccccccccccccccccccc44ccccccccccccccccccccccccccccccffffffffbbbbccccbbb3333ccccc1
-50001112223335cccccccc11cc1111cccccffccccccccccccccccc444433cccc33444cccce33e333333444ccccccccccbbbfffaaafffbbfbbcbbb33bb333ccc1
-54445556667775ccccc11111cc11111ccc4ffffffffffffffffff44444433333334444333333333e3344444fffffbbbbbbfaaaaaaaaafbbbbc3333bbbb333cc1
-54445556667775c1111111111cc1111cc4fffffffffffffffffffff44444333333344444333e3333444444fffffbbbbbbfaaaaa6aaaaafbbcc3333bbbb3333c1
-54445556667775111111111111ccc1cccfffffffffffffffffffffff444444333344444443333334444433333ffbbbbbffaa6666666aaaaaaaaa3333333333c1
-5888999aaabbb5111111111111ccccccfffffffffffffffffffffffff44444444444444444444ccccccc344433bbbbbbffaa6aa6aaaaaaaaaaaaa3e3333333c1
-5888999aaabbb5111111111cccc1ccccccccccccccffffffffffffffff444444444444444444ccccccccccc443bbbbbfffaa666666666666666aaa33333333c1
-5888999aaabbb5111ccccccccccccccccccccccccccccccccccccccfffff44444444444444cccccccccccccc43bbbbbfffaaaa6aaa6aaaaaaaaaa333e33333c1
-5cccdddeeefff511ccccccccccccccccccccccccccccccccccccccccccccff44444444ccccccccccc44ccccc43bbbbbfffaa6666666aaaaaaaaa3333333333c1
-5cccdddeeefff5cccccccccccfbbbbbbbccccccccccccccccccccccccccccccccccccccccccccccc44bbcccc33bbbbbbffaaaaaaaaaaafc334333333333333c1
-5cccdddeeefff5cccccccccfbbbfffffffffaaaffff4f4444cccccccccccccccccccccc4ffccccc33ebbbcccc3bbbbbbb33aaaaaaaaabcc33333333333333cc1
-55555555555555ccccccbbbbbaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaffbfffffffff44ffffcccc43bbbbcccccffbbbbb3f33fffffffffc33333333333e33fcc1
+11111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111
+111111111111111111111cccccccccccccccccc1111111111cccccccccccccccccccccccccccccccccccccc11111cccccccccccccccccccccccccccccccccc11
+11111111111cccc111ccccccccccccccccccccccccccccccccccccccccccccccccc44ccccccccccccccccccccccccccccccffffffffbbbbccccbbb3333ccccc1
+111111111ccccccccccccc11cc1111cccccffccccccccccccccccc444433cccc33444cccce33e333333444ccccccccccbbbfffaaafffbbfbbcbbb33bb333ccc1
+11111111ccccccccccc11111cc11111ccc4ffffffffffffffffff44444433333334444333333333e3344444fffffbbbbbbfaaaaaaaaafbbbbc3333bbbb333cc1
+1111111ccccccccc111111111cc1111cc4fffffffffffffffffffff44444333333344444333e3333444444fffffbbbbbbfaaaaa6aaaaafbbcc3333bbbb3333c1
+111111ccccccccc11111111111ccc1cccfffffffffffffffffffffff444444333344444443333334444433333ffbbbbbffaa6666666aaaaaaaaa3333333333c1
+11111ccccccccc111111111111ccccccfffffffffffffffffffffffff44444444444444444444ccccccc344433bbbbbbffaa6aa6aaaaaaaaaaaaa3e3333333c1
+1111cccccccc11111111111cccc1ccccccccccccccffffffffffffffff444444444444444444ccccccccccc443bbbbbfffaa666666666666666aaa33333333c1
+1111cccccc1111111ccccccccccccccccccccccccccccccccccccccfffff44444444444444cccccccccccccc43bbbbbfffaaaa6aaa6aaaaaaaaaa333e33333c1
+111ccccc11111111ccccccccccccccccccccccccccccccccccccccccccccff44444444ccccccccccc44ccccc43bbbbbfffaa6666666aaaaaaaaa3333333333c1
+111ccc11111111cccccccccccfbbbbbbbccccccccccccccccccccccccccccccccccccccccccccccc44bbcccc33bbbbbbffaaaaaaaaaaafc334333333333333c1
+11ccc11111111ccccccccccfbbbfffffffffaaaffff4f4444cccccccccccccccccccccc4ffccccc33ebbbcccc3bbbbbbb33aaaaaaaaabcc33333333333333cc1
+11cc11111111ccccccccbbbbbaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaffbfffffffff44ffffcccc43bbbbcccccffbbbbb3f33fffffffffc33333333333e33fcc1
 11cc1111111cccccbbbbbbbbaaaaaaaaaaaaa6aaaaaaaaaaaaaaaaaaabbfffffffffffffffccc4433bbcccccffffbbbbbb33fffffffffc33333333333333fcc1
-11cc1111111cccffbbbbbbbbaa66666666666666666666666666666aab333fffffffffffffcccc433cccccccbffffbbbb3bb3ffffffffc333343333e3333fcc1
-1ccc1111111cccfffbfbbbbbaa6aaaaaaaaaa6aaaa6aaaaa6aaaaaaaa33333fffffff333334cccc3ccccccccbb3333bbbbfbbfffffffccf333333333333ffcc1
+1ccc111111ccccffbbbbbbbbaa66666666666666666666666666666aab333fffffffffffffcccc433cccccccbffffbbbb3bb3ffffffffc333343333e3333fcc1
+1ccc111111ccccfffbfbbbbbaa6aaaaaaaaaa6aaaa6aaaaa6aaaaaaaa33333fffffff333334cccc3ccccccccbb3333bbbbfbbfffffffccf333333333333ffcc1
 1cccc111111cccfffbbbbbbbaa6aaaaaaaaaa6aaaa6aaaaa6aaaaaaa3333333fffff33333344cccccccccccb333b33bbbbbbbfffffffcffbb33333333bbfccc1
 1ccccccc111ccccfffbbbbbaaa6aaaaebaaaa6aaaa6aafaa6aaffbbb3333e33333ff333e33344ccccccccbb33bbb33bbbbbbbfffffffcfffb3333333bbbfccc1
 11ccccccc11ccccffffbbbbaa6666aabcaa666aaaa6aafaa6aaffbb3333b333333334433333344443ffffb33bbbb333bbbbbbffffffccfffbb33333bbbbfcc11
 11cccccccc11cccffffffffaaa6aaaaebaaaa6aaaa6aafaaaaafbb3333bb33333334444b333333333ffff33bbbbb333bbbbfbffffffcfffffbbb33bbbfffcc11
-11ccccccccccccccffffffffaa6aaaaaaaaaaaaaaa6aaffaaafbb333bbbb333334444bbbbbbbfffffffff3bbbbbe333bbbbbbffffffcffffffbbbbbbbbffcc11
+11ccccccccccccccffffbfffaa6aaaaaaaaaaaaaaa6aaffaaafbb333bbbb333334444bbbbbbbfffffffff3bbbbbe333bbbbbbffffffcffffffbbbbbbbbffcc11
 11cccccbccc1ccccbbffffffaa6aaaaaaaaaaaaaaa6aafffffbbbbbbbbb333333344bbbbbbbfffffffffb33bbbe3333bbbbbbfffffccffffffbbbbbbffffcc11
 1cccccbbbcccccccbbbbffffaa6aaaaaa66666aaaa6aafffbbbbbbbbbb3333e33333bbfbbbffffffffbbbb33333333bbbbbbbfffffcfffffffffffffffffccc1
 1ccbbb33bbccc1ccbbbbbaaaaa6aaa6aa6aaa6aaaa6aaffbbb3333bbbb3333333333bbffbfffffffffbbbbb3333333bbbbbbbbfffccffffffffffffffffffcc1
