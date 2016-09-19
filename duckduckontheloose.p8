@@ -90,14 +90,13 @@ function _init()
  perspective_offset={64,80}
  height_mult=0.015
  
+ cell_size=32
  cells={
- w=32,
- h=32,
  bounds={128,128},
  bound_str=2
  }
- cells.fill_x=flr(128/cells.w+0.5)
- cells.fill_y=flr(128/cells.h+0.5)
+ cells.fill_x=flr(128/cell_size+0.5)
+ cells.fill_y=flr(128/cell_size+0.5)
  
  
  biomes={}
@@ -145,8 +144,8 @@ function _init()
  
  buildings={
  height_range={10,35},
- w_range={8,min(cells.w,cells.h)-16},
- h_range={8,min(cells.w,cells.h)-16},
+ w_range={8,min(cell_size,cell_size)-16},
+ h_range={8,min(cell_size,cell_size)-16},
  colours={8,9,6}
  }
  
@@ -178,25 +177,25 @@ function _init()
  }
  
  add(ducklings,{ -- forest clearing
-  p=v_add(v_mul({23,60},32),{rnd(cells.w),rnd(cells.h)})
+  p=v_add(v_mul({23,60},32),{rnd(cell_size),rnd(cell_size)})
  })
  add(ducklings,{ -- obblesville lake
-  p=v_add(v_mul({118,8},32),{rnd(cells.w),rnd(cells.h)})
+  p=v_add(v_mul({118,8},32),{rnd(cell_size),rnd(cell_size)})
  })
  add(ducklings,{ -- old poctridge crater
-  p=v_add(v_mul({26,105},32),{rnd(cells.w),rnd(cells.h)})
+  p=v_add(v_mul({26,105},32),{rnd(cell_size),rnd(cell_size)})
  })
  add(ducklings,{ -- spiral garden
-  p=v_add(v_mul({69,82},32),{rnd(cells.w),rnd(cells.h)})
+  p=v_add(v_mul({69,82},32),{rnd(cell_size),rnd(cell_size)})
  })
  add(ducklings,{ -- new poctridge
-  p=v_add(v_mul({118,105},32),{rnd(cells.w),rnd(cells.h)})
+  p=v_add(v_mul({118,105},32),{rnd(cell_size),rnd(cell_size)})
  })
  add(ducklings,{ -- ackelsby park
-  p=v_add(v_mul({32,19},32),{rnd(cells.w),rnd(cells.h)})
+  p=v_add(v_mul({32,19},32),{rnd(cell_size),rnd(cell_size)})
  })
  add(ducklings,{ -- mountain
-  p=v_add(v_mul({107,84},32),{rnd(cells.w),rnd(cells.h)})
+  p=v_add(v_mul({107,84},32),{rnd(cell_size),rnd(cell_size)})
  })
  
  p.r=4 
@@ -211,8 +210,8 @@ function _init()
  cam.p_o=cam.p
  
  cells.current={
-  flr(cam.p[1]/cells.w),
-  flr(cam.p[2]/cells.h)
+  flr(cam.p[1]/cell_size),
+  flr(cam.p[2]/cell_size)
  }
  
  
@@ -323,7 +322,7 @@ function _init()
 
  	{who="spooky ghost",spr=14,
  	mouth=7,mouth_offset=0,
- 	c1=7,c2=7,r=3,height=4,
+ 	c1=7,c2=6,r=3,height=4,
   cell={17,77},
   lines="hi duck duck!|how's it going?|keeping busy?|you always were a go-getter.|never could sit still...|that's not really my style, you know?|i tend to stay put.|course, i always appreciate visitors.|drop by anytime!|"},
 
@@ -433,7 +432,7 @@ function _init()
  }
  
  for npc in all(npcs) do
-  npc.p={rnd(cells.w),rnd(cells.h)}
+  npc.p={rnd(cell_size),rnd(cell_size)}
   npc.r2=npc.r*npc.r
   
   if npc.cell==nil then
@@ -549,10 +548,10 @@ function init_cells()
   c.c=3
   local t={
    height=range(trees.height_range),
-   girth=min(cells.w,cells.h)*2/5,
+   girth=min(cell_size,cell_size)*2/5,
    p={
-    cells.w/2,
-    cells.h/2
+    cell_size/2,
+    cell_size/2
    },
    leaves={{0,0},{0,0},{0,0}}
   }
@@ -563,8 +562,8 @@ function init_cells()
   -- normal cell
   
   --trees
-  for x=0,cells.w-trees.gap,trees.gap do
-  for y=0,cells.h-trees.gap,trees.gap do
+  for x=0,cell_size-trees.gap,trees.gap do
+  for y=0,cell_size-trees.gap,trees.gap do
    if rnd() < tree_freq then
     local t={
      height=range(trees.height_range),
@@ -576,8 +575,8 @@ function init_cells()
      leaves={{0,0},{0,0},{0,0}}
     }
     t.p={
-    mid(t.girth,t.p[1],cells.w-t.girth),
-    mid(t.girth,t.p[2],cells.h-t.girth)
+    mid(t.girth,t.p[1],cell_size-t.girth),
+    mid(t.girth,t.p[2],cell_size-t.girth)
     }
     t.s=t.p
     add(c.trees,t)
@@ -587,8 +586,8 @@ function init_cells()
   
   --bushes
   if rnd() < c.biome.bush_props[1] then
-   local x=rnd(cells.w)
-   local y=rnd(cells.h)
+   local x=rnd(cell_size)
+   local y=rnd(cell_size)
    local r=0
    local bloom_colours=c.biome.bush_props[3]
    local colour=bloom_colours[flr(rnd(#bloom_colours))%#bloom_colours+1]
@@ -637,7 +636,7 @@ function init_cells()
      range(buildings.w_range),
      range(buildings.h_range)
     },
-    p={cells.w/2,cells.h/2},
+    p={cell_size/2,cell_size/2},
     height=range(buildings.height_range),
     c=buildings.colours[flr(rnd(16))%#buildings.colours+1]
    }
@@ -765,13 +764,13 @@ function _update()
  cam.v=v_sub(cam.p,cam.p_o)
 
  cam.c={
- cam.p[1]%cells.w,
- cam.p[2]%cells.h
+ cam.p[1]%cell_size,
+ cam.p[2]%cell_size
  }
 
  local cell={
- flr(cam.p[1]/cells.w),
- flr(cam.p[2]/cells.h)
+ flr(cam.p[1]/cell_size),
+ flr(cam.p[2]/cell_size)
  }
  if cell[1]!=cells.current[1] or cell[2]!=cells.current[2] then
   cells.current=cell
@@ -791,8 +790,8 @@ function _update()
  
  
  local pcell={
- flr(p.p[1]/cells.w),
- flr(p.p[2]/cells.h)
+ flr(p.p[1]/cell_size),
+ flr(p.p[2]/cell_size)
  }
  
  pcell=v_sub(pcell,cell)
@@ -848,8 +847,8 @@ function update_collision()
  end
  
  -- boundaries
- local x=p.p[1]/cells.w
- local y=p.p[2]/cells.h
+ local x=p.p[1]/cell_size
+ local y=p.p[2]/cell_size
  if x > cells.bounds[1] then
   p.v[1] -= (x-cells.bounds[1])*cells.bound_str
  elseif x < 0 then
@@ -871,8 +870,8 @@ function update_trees()
  local ts=cells.a[x][y].trees
  
  local cellp = {
-  cam.p[1]%cells.w-x*cells.w,
-  cam.p[2]%cells.h-y*cells.h
+  cam.p[1]%cell_size-x*cell_size,
+  cam.p[2]%cell_size-y*cell_size
  }
  
  for t in all(ts) do
@@ -887,7 +886,7 @@ function update_trees()
   t.s
   }
   
-  add_blob(v_add({(cells.current[1]+x)*cells.w,(cells.current[2]+y)*cells.h},t.p), t.girth)
+  add_blob(v_add({(cells.current[1]+x)*cell_size,(cells.current[2]+y)*cell_size},t.p), t.girth)
   
  end
  
@@ -928,8 +927,8 @@ function update_bushes()
  local bs=cells.a[x][y].bushes
  
  local cellp = {
-  cam.p[1]%cells.w-x*cells.w,
-  cam.p[2]%cells.h-y*cells.h
+  cam.p[1]%cell_size-x*cell_size,
+  cam.p[2]%cell_size-y*cell_size
  }
  
  for b in all(bs) do
@@ -952,8 +951,8 @@ function update_buildings()
  
  if b then
   local cellp = {
-   cam.p[1]%cells.w-x*cells.w,
-   cam.p[2]%cells.h-y*cells.h
+   cam.p[1]%cell_size-x*cell_size,
+   cam.p[2]%cell_size-y*cell_size
   }
   b.s=v_sub(b.p,v_add(cellp,perspective_offset))
   
@@ -962,7 +961,7 @@ function update_buildings()
   for i=-s1+s2/2,s1-s2/2,s2 do
    local blob={
     hit = false,
-    p = v_add({(cells.current[1]+x)*cells.w,(cells.current[2]+y)*cells.h},b.p),
+    p = v_add({(cells.current[1]+x)*cell_size,(cells.current[2]+y)*cell_size},b.p),
     r = s2,
     r2=s2*s2
    }
@@ -975,7 +974,7 @@ function update_buildings()
   end
   local blob={
    hit = false,
-   p = v_add({(cells.current[1]+x)*cells.w,(cells.current[2]+y)*cells.h},b.p),
+   p = v_add({(cells.current[1]+x)*cell_size,(cells.current[2]+y)*cell_size},b.p),
    r = s2,
    r2=s2*s2
   }
@@ -999,8 +998,8 @@ function update_npcs()
   
   if v_distm(npc.p2,v_add(cells.current,{2,2})) <= 4 then
   npc.active=true
-  npc.p2[1]*=cells.w
-  npc.p2[2]*=cells.h
+  npc.p2[1]*=cell_size
+  npc.p2[2]*=cell_size
   npc.p2=v_add(npc.p, npc.p2)
   
   npc.s=v_sub(npc.p2,v_add(cam.p,perspective_offset))
@@ -1185,6 +1184,10 @@ function _draw()
   draw_dialog()
  end
  
+ 
+ camera(0,0)
+ print_ol(flr(p.p[1]/cell_size).."\n"..flr(p.p[2]/cell_size),10,10,0,7)
+
 end
 
 function draw_bg()
@@ -1193,12 +1196,12 @@ function draw_bg()
  for a=0,cells.fill_x do
  for b=0,cells.fill_y do
  
- x=(cells.current[1]+a)*cells.w
- y=(cells.current[2]+b)*cells.h
+ x=(cells.current[1]+a)*cell_size
+ y=(cells.current[2]+b)*cell_size
  
  local cell=cells.a[a][b]
  
- rectfill(x,y,x+cells.w,y+cells.h,cell.c)
+ rectfill(x,y,x+cell_size,y+cell_size,cell.c)
  
  if cell.biome.transition then
  srand(cell.seed)
@@ -1206,29 +1209,29 @@ function draw_bg()
  local c=cell.edges[1][0]
  if c!=cell.c then
   pal(0,c)
-  for v=0,cells.h/8 do
-   spr(4+flr(rnd"4")*16,x+cells.w-8, y+v*8)
+  for v=0,cell_size/8 do
+   spr(4+flr(rnd"4")*16,x+cell_size-8, y+v*8)
   end
  end
  c=cell.edges[-1][0]
  if c!=cell.c then
   pal(0,c)
-  for v=0,cells.h/8 do
+  for v=0,cell_size/8 do
    spr(3+flr(rnd"4")*16,x, y+v*8)
   end
  end
  c=cell.edges[0][-1]
  if c!=cell.c then
   pal(0,c)
-  for u=0,cells.w/8 do
+  for u=0,cell_size/8 do
    spr(2+flr(rnd"4")*16,x+u*8, y)
   end
  end
  c=cell.edges[0][1]
  if c!=cell.c then
   pal(0,c)
-  for u=0,cells.w/8 do
-   spr(1+flr(rnd"4")*16,x+u*8, y+cells.h-8)
+  for u=0,cell_size/8 do
+   spr(1+flr(rnd"4")*16,x+u*8, y+cell_size-8)
   end
  end
  
@@ -1308,8 +1311,8 @@ function draw_trees(shadows)
  
  local trees=cells.a[a][b].trees
  camera(
-  cam.c[1]-a*cells.w,
-  cam.c[2]-b*cells.h
+  cam.c[1]-a*cell_size,
+  cam.c[2]-b*cell_size
  )
  
  if shadows then
@@ -1357,8 +1360,8 @@ function draw_buildings(shadows)
  if b then
  
  camera(
-  cam.c[1]-x*cells.w,
-  cam.c[2]-y*cells.h
+  cam.c[1]-x*cell_size,
+  cam.c[2]-y*cell_size
  )
  
  if shadows then
@@ -1409,8 +1412,8 @@ function draw_bushes(shadows)
  
  local bushes=cells.a[a][b].bushes
  camera(
-  cam.c[1]-a*cells.w,
-  cam.c[2]-b*cells.h
+  cam.c[1]-a*cell_size,
+  cam.c[2]-b*cell_size
  )
  
  if shadows then
@@ -1481,20 +1484,20 @@ function draw_debug()
   color"6"
  end
  rect(
- x*cells.w+1,
- y*cells.h+1,
- (x+1)*cells.w-1,
- (y+1)*cells.h-1
+ x*cell_size+1,
+ y*cell_size+1,
+ (x+1)*cell_size-1,
+ (y+1)*cell_size-1
  )
  print(x.." "..y,
- x*cells.w+3,
- y*cells.h+3)
+ x*cell_size+3,
+ y*cell_size+3)
  print("ts:"..#cell.trees,
- x*cells.w+3,
- y*cells.h+10)
+ x*cell_size+3,
+ y*cell_size+10)
  print("bs:"..#cell.bushes,
- x*cells.w+3,
- y*cells.h+17)
+ x*cell_size+3,
+ y*cell_size+17)
  end
  end
  
@@ -1735,8 +1738,8 @@ eeeee77777777eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee7777777777eeeeeeeeeeeeeeeeee
 eeeee711111877eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee7000000007eeeeeee77777777eeeeeeeeeeeeeeeeeeeeeee70000000077eeeee7777ee77777e
 eeee771c1c18877eeeeeee777eee777eeeeeee777eee777eeeee7000000007eeeeee77f0ffff77eeeeeeeeeeeeeeeeeeeeee70000000007eeee7700777700077
 eeee71818181887eeeeeee797777797eeeeeee707777707eee77788888888777eeee7fff0ffff7eeeeeee77777777eeeeeee70000000007eeee7000000000007
-eeee78888888187eeeeeee799777997eeeeeee700777007eee700ffffffff007eeee7ffff000f7eeeeee7700000077eeeeee70ddddd0007eeee7000dddd00007
-eeee7ff0f0ff817eeeeeee7999999a7eeeeeee700000067eee777ff0f0fff777eeee7ff0f000f77eeeee700dddd007eeeeee7ddadadd007eeee770dadadd0077
+eeee78888888187eeeeeee799777997eeeeeee700777007eee700afffffaa007eeee7ffff000f7eeeeee7700000077eeeeee70ddddd0007eeee7000dddd00007
+eeee7ff0f0ff817eeeeeee7999999a7eeeeeee700000067eee777ff0f0ffa777eeee7ff0f000f77eeeee700dddd007eeeeee7ddadadd007eeee770dadadd0077
 eeee7ff0f0fff87eeeeeee7999999a7eeeeeee700000067eeeee7ff0f0fff7eeeeee7ffff000ff7eeeee70dadadd07eeeeee7ddddddd007eeeee7dddddddd77e
 ee777ff0f0ffff7eeeeeee790909997eeeeeee709090007eeeee7ff0f0fff77eeeee7fffffff0f7eeeee7dddddddd7eeeeee7ddadadd0d7eeeee7ddadadddd7e
 ee717ffffffff17eeeeee7790909997eeeeee7709090007eeeee7fffffffff7eeeee7ff000fff77eeeee7ddadaddd77eeeee7ddddddddd7eeeee7ddddddddd7e
@@ -1748,21 +1751,21 @@ e788774444478877ee79977799999999ee70077700000000e7000000ff007eeeeeee7766666677ee
 e788771441178817ee7799799aaaa999ee77007000000000e700000088007eeeeeee7ff8888ff7eeeeeee700dd007eeeeeee7000000007eeeee770000000077e
 e771111111177117eee77979aaaaaa99eee7707000000000e777770066007eeeeeee7fff66fff7eeeeeee70000007eeeeeee7000000007eeeee700000000007e
 eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee777eeeeeeeee77777eeeeeeeeeeeeeeeeeeeee
-eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee767eeeeeeee77979777eeeeeeeeeeeeeeeeeee
-ee777777777777eeeeeee77777777eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee77777757eeeeeee77a9a9a977eeeeeee77777777eee
-e77444444444477eeeee7744444477eeeeeeee999999eeeeeeeeee999999eeeeeeeeee999999eeeeeeee7766666677eeeeee79a444a9a7eeeeee7755555577ee
-e74444444444447eeeee7444444447eeeeeee99ffff99eeeeeeee99888899eeeeeeee99888899eeeeeee7666666667eeeeee7444444447eeeeee7aaaaaaaa7ee
-e74000040040047eeeee7400400447eeeeeee9f0f0ff9eeeeeeee98080889eeeeeeee98080889eeeeeee7663636667eeeeee7440404447eeeeee7accccc6a7ee
-e74444444444447eeeee7400400447eeeeeeeff0f0fffeeeeeeee88080888eeeeeeee88080888eeeeeee766a6a6667eeeeee7440404447eeeeee7ac7c7c6a7ee
-e74000004000047eeeee74404044477eeeeeeff0f0fffeeeeeeee88080888eeeeeeee88080888eeeeeee7663636667eeeeee74404044477eeeee7ac7c7c6a7ee
-e74444444444447eeeee74444444447eeeeeefffffffffeeeeeee888888888eeeeeee888888888eeeeee7666666667eeeeee74444444447eeeee7accccc6a7ee
-e74004000400047eeeee74444444447eeeeeefffffffffeeeeeee888888888eeeeeee888888888eeeeee7666666667eeeeee74444404447eeeee7a66666aa7ee
-e74444444444447eeeee74400044477eeeeeeff000fffeeeeeeee88000888eeeeeeee88000888eeeeeee7777777777eeeeee74400044477eeeee7a65656aa7ee
-e77777744777777eeeee7444444447eeeeeeeffffffffeeeeeeee88888888eeeeeeee88888888eeeeeeee76666667eeeeeee7444444447eeeeee7766666a777e
-eeeeee7447eeeeeeeeee7774444777eeeeeeeeeffffeeeeeeeeeeee8888eeeeeeeeeeee8888eeeeeeeeee76666667eeeeeee7774444777eeeeeee7755556667e
-eeeeee7447eeeeeeeeeee79944997eeeeeeeeebbffbbeeeeeeeeeeaa88aaeeeeeeeeeeaa88aaeeeeeeeee77555577eeeeeee778f44f877eeeeee776aaa6a667e
-eeeeee7447eeeeeeeeeee79999997eeeeeeeeebbbbbbeeeeeeeeeeaaaaaaeeeeeeeeeeaaaaaaeeeeeeeeee755557eeeeeeee748ffff847eeeeee7a6aaa6aa67e
-eeeeee7447eeeeeeeeeee79999997eeeeeeeeebbbbbbeeeeeeeeeeaaaaaaeeeeeeeeeeaaaaaaeeeeeeeeee755557eeeeeeee748f88f847eeeeee7a6aaa6aa67e
+eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee777777777eeeeeeeeeeee767eeeeeeee77979777eeeeeeeeeeeeeeeeeee
+ee777777777777eeeeeee77777777eeeeeeee77777777eeeeeeeeeeeeeeeeeeeeeee77444444477eeeeee77777757eeeeeee77a9a9a977eeeeeee77777777eee
+e77444444444477eeeee7744444477eeeeee7799999977eeeeeee77777777eeeeeee74444444447eeeee7766666677eeeeee79a444a9a7eeeeee7755555577ee
+e74444444444447eeeee7444444447eeeeee799ffff997eeeeee7700000077eeeee7744ffff44477eeee7666666667eeeeee7444444447eeeeee7aaaaaaaa7ee
+e74000040040047eeeee7400400447eeeeee79f0f0ff97eeeeee7044444007eeeee74444f44f4447eeee7663636667eeeeee7440404447eeeeee7accccc6a7ee
+e74444444444447eeeee7400400447eeeeee7ff0f0fff7eeeeee7440404407eeeee744f0f0ff4447eeee766a6a6667eeeeee7440404447eeeeee7ac7c7c6a7ee
+e74000004000047eeeee74404044477eeeee7ff0f0fff77eeeee7440404407eeeee744f0f0ff4447eeee7663636667eeeeee74404044477eeeee7ac7c7c6a7ee
+e74444444444447eeeee74444444447eeeee7fffffffff7eeeee74404044077eeee744ffffff4f47eeee7666666667eeeeee74444444447eeeee7accccc6a7ee
+e74004000400047eeeee74444444447eeeee7fffffffff7eeeee74444444447eeee744ffffff5f47eeee7666666667eeeeee74444404447eeeee7a66666aa7ee
+e74444444444447eeeee74400044477eeeee7ff000fff77eeeee74444444447eeee744f000ff4447eeee7777777777eeeeee74400044477eeeee7a65656aa7ee
+e77777744777777eeeee7444444447eeeeee7ffffffff7eeeeee74400044477eeee774ffffff9447eeeee76666667eeeeeee7444444447eeeeee7766666a777e
+eeeeee7447eeeeeeeeee7774444777eeeeee777ffff777eeeeee7744444477eeeeee744ffff44447eeeee76666667eeeeeee7774444777eeeeeee7755556667e
+eeeeee7447eeeeeeeeeee79944997eeeeeeee7bbffbb7eeeeeeee77444477eeeeeee7422ff224477eeeee77555577eeeeeee778f44f877eeeeee776aaa6a667e
+eeeeee7447eeeeeeeeeee79999997eeeeeeee7bbbbbb7eeeeeeee73344337eeeeeee77222222477eeeeeee755557eeeeeeee748ffff847eeeeee7a6aaa6aa67e
+eeeeee7447eeeeeeeeeee79999997eeeeeeee7bbbbbb7eeeeeeee73333337eeeeeeee7ff22ff77eeeeeeee755557eeeeeeee748f88f847eeeeee7a6aaa6aa67e
 eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee
 eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee
 eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee
