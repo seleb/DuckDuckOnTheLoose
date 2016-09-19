@@ -177,26 +177,26 @@ function _init()
  found_timer=0
  }
  
- add(ducklings,{
-  p={10,10}
+ add(ducklings,{ -- forest clearing
+  p=v_add(v_mul({23,60},32),{rnd(cells.w),rnd(cells.h)})
  })
- add(ducklings,{
-  p={20,20}
+ add(ducklings,{ -- obblesville lake
+  p=v_add(v_mul({118,8},32),{rnd(cells.w),rnd(cells.h)})
  })
- add(ducklings,{
-  p={30,30}
+ add(ducklings,{ -- old poctridge crater
+  p=v_add(v_mul({26,105},32),{rnd(cells.w),rnd(cells.h)})
  })
- add(ducklings,{
-  p={40,40}
+ add(ducklings,{ -- spiral garden
+  p=v_add(v_mul({69,82},32),{rnd(cells.w),rnd(cells.h)})
  })
- add(ducklings,{
-  p={50,50}
+ add(ducklings,{ -- new poctridge
+  p=v_add(v_mul({118,105},32),{rnd(cells.w),rnd(cells.h)})
  })
- add(ducklings,{
-  p={60,60}
+ add(ducklings,{ -- ackelsby park
+  p=v_add(v_mul({32,19},32),{rnd(cells.w),rnd(cells.h)})
  })
- add(ducklings,{
-  p={70,70}
+ add(ducklings,{ -- mountain
+  p=v_add(v_mul({107,84},32),{rnd(cells.w),rnd(cells.h)})
  })
  
  p.r=4 
@@ -302,57 +302,134 @@ function _init()
  	{who="drake",spr=1,
  	mouth=-1,mouth_offset=0,
  	c1=4,c2=3,r=3,height=2,
+  cell={81,15},
  	lines="duck duck! we need your help!|we lost our babies!!!!!|we had eight before, but now we only have one!|i don't know what happened to the rest!|i'm staying here to keep track of the last one.|please find the other seven!|we're counting on you\nduck duck!|"},
+
  	{who="hen",spr=0,
  	mouth=-1,mouth_offset=0,
  	c1=6,c2=4,r=3,height=2,
- 	lines="duck duck! you need to find our babies!|we lost them!!!!!|one's still here, but there are seven on the loose!|you've got to find them!|don't let us down duck duck!|"},
+  cell={83,15},
+ 	lines="duck duck! you need to find our babies!|we lost them!!!!!|one's here, but seven are out there all alone!|you've got to find them!|don't let us down duck duck!|"},
+
  	{who="duckling",spr=2,
  	mouth=-1,mouth_offset=0,
  	c1=9,c2=10,r=2,height=2,
+  cell={81,16},
  	lines="hi duck duck!|are you going to find my brothers and sisters?|they're hiding somewhere around here...|i'll let you know if i see them!|good luck duck duck!|"},
+
  	{who="dumb alien",spr=15,
  	mouth=10,mouth_offset=-4,
  	c1=0,c2=11,r=4,height=4},
+
  	{who="spooky ghost",spr=14,
  	mouth=7,mouth_offset=0,
- 	c1=7,c2=7,r=3,height=4},
+ 	c1=7,c2=7,r=3,height=4,
+  cell={17,77},
+  lines="hi duck duck!|how's it going?|keeping busy?|you always were a go-getter.|never could sit still...|that's not really my style, you know?|i tend to stay put.|course, i always appreciate visitors.|drop by anytime!|"},
+
  	{who="giddy girl",spr=13,
  	mouth=0,mouth_offset=2,
  	c1=10,c2=8,r=3,height=2},
+
  	{who="hipster",spr=12,
  	mouth=0,mouth_offset=0,
  	c1=13,c2=15,r=3,height=4},
+
  	{who="tommy tim-tom",spr=11,
  	mouth=0,mouth_offset=0,
  	c1=1,c2=15,r=4,height=4,
+  cell={58,58},
   lines="duck duck, buddy!|how's it going?|on an adventure, i see!|i know how that goes...|but that life's not for ol' tommy!|leave the adventurin' to the birds, i always say!|speaking of birds...|what's up with those ducklings?|i saw one headed out west earlier...|course i didn't follow!|birds know best, as i always say!|or is it \"birds know west\"?|...|well, i'll let you get back to it...|best o' luck duck duck!|"},
+
  	{who="swimmer",spr=10,
  	mouth=0,mouth_offset=-4,
  	c1=10,c2=13,r=4,height=3,
- 	lines="oh! duck duck!|what a great day for a swim.|wouldn't you agree?|i've been doing calisthenics here every day.|i feel so much better for it!|so full of energy!|swimming is such great exercise.|though i'm sure you already knew that! ha ha!|...|my friends think i'm crazy for doing this.|they say it's dangerous to be out here alone.|they keep telling me but i just ignore them.|it's like water off a duck's back!|ha ha!|...|thanks for the visit...|but i should get back to exercising.|see you around duck duck!|"},
+  cell={28,84},
+ 	lines="oh! duck duck!|what a great day for a swim.|wouldn't you agree?|i've been doing calisthenics here every day.|i feel so much better for it!|so full of energy!|swimming is such great exercise.|though i'm sure you already knew that!\nha ha!|...|my friends think i'm crazy for doing this.|they say it's dangerous to be out here alone.|they keep telling me but i just ignore them.|it's like water off a duck's back!|ha ha!|...|thanks for the visit...|but i should get back to exercising.|see you around duck duck!|"},
+
  	{who="bouncer",spr=9,
  	mouth=0,mouth_offset=-4,
  	c1=9,c2=15,r=4,height=4},
- 	{who="pupper",spr=8,
- 	mouth=0,mouth_offset=0,
- 	c1=4,c2=4,r=3,height=2},
+
+  {who="pupperino",spr=8,
+  mouth=0,mouth_offset=0,
+  c1=4,c2=4,r=3,height=2,
+  cell={23,61},
+  lines="greetings duck duck.|the young of your kind is very disruptful.|the peaceful clearing should not be disrupted.|please leave, and take the young with you.|"},
+
+  {who="pupperoni",spr=8,
+  mouth=0,mouth_offset=0,
+  c1=4,c2=4,r=3,height=2,
+  cell={23,61},
+  lines="hello duck duck.|please take your young and leave.|this clearing is a place of peace.|a peace which your kind now disturbs.|begone.|"},
+
+  {who="doggo",spr=8,
+  mouth=0,mouth_offset=0,
+  c1=4,c2=4,r=3,height=2,
+  cell={24,62},
+  lines="hey duck duck.|sorry about the others.|they take the \"peaceful clearing\" very seriously.|"},
+
  	{who="?",spr=7,
  	mouth=0,mouth_offset=0,
  	c1=2,c2=4,r=4,height=4},
- 	{who="blondie",spr=6,
+
+ 	{who="barbara",spr=6,
  	mouth=2,mouth_offset=0,
- 	c1=8,c2=10,r=4,height=3},
+ 	c1=8,c2=10,r=4,height=3,
+  cell={107,8},
+  lines="hi there! you must be duck duck.|are you looking for those ducklings from earlier?|i think most of them left already.|they were super cute!|...|...|do you ever wonder if you waited too late to have kids?|ha ha! me neither!|...|...|"},
+
  	{who="buddy boy",spr=5,
  	mouth=0,mouth_offset=2,
  	c1=12,c2=15,r=3,height=2},
+
  	{who="ranger",spr=4,
  	mouth=0,mouth_offset=0,
- 	c1=3,c2=15,r=4,height=4},
+ 	c1=3,c2=15,r=4,height=4,
+  cell={106,69},
+  lines="hoi duck duck!|what's the news from the lake?|anything to report?|it's been pretty quiet in these parts.|couple ruffians came through earlier...|nothing i couldn't handle though!|i sent them packing down south, yes i did!|youngsters like that have no business in these woods!|all running about as if they own the place...|no respect for nature!|not at all like you duck duck.|i can always count on you to get things done right!|...|best let you get back to it duck duck!|"},
+
  	{who="scarves mcgee",spr=3,
- 	mouth=0,mouth_offset=0,
- 	c1=5,c2=4,r=4,height=4,
-  lines="hello duck duck!|how are you today?|i'm taking a personal day...|get me some me time, you know?|oh, speaking of which...|i saw a couple ducklings strolling through town.|looked like they were making a day of it!|anyway, nice catching up with you.|make sure to hit me up next time you're in town!|...|...|...i wonder if i should get a new scarf...|"}
+  mouth=0,mouth_offset=0,
+  c1=5,c2=4,r=4,height=4,
+  cell={37,26},
+  lines="hello duck duck!|how are you today?|i'm taking a personal day...|get me some me time, you know?|oh, speaking of which...|i saw a couple ducklings strolling through town.|looked like they were making a day of it!|i doubt they stuck around though.|not much space around here...|anyway, nice catching up with you.|make sure to hit me up next time you're in town!|...|...|...i wonder if i should get a new scarf...|"},
+
+ {who="mountain climber",spr=16,
+  mouth=0,mouth_offset=0,
+  c1=1,c2=8,r=4,height=4,
+  cell={107,83},
+  lines="wow duck duck!|you climbed this mountain too?|impressive!|isn't it great here? we're so far up!|so far away from everything...|it was quite a hike!|one slip and that would've been it for me!|...|i hope we'll have a safe trip back to base camp.|wouldn't want them to send a rescue team after us!|...|*sigh*|i know, duck duck.|i know it's all flat.|but... let me have this moment, okay?|...|thanks duck duck.|...|...|i think i can see my house from here!|"},
+
+ {who="worker",spr=31,
+  mouth=-1,mouth_offset=0,
+  c1=10,c2=12,r=4,height=4,
+  cell={32,100},
+  lines="duck duck?! you shouldn't be out here!|it's really dangerous!|you aren't wearing protective gear or anything!|ohhh - if my supervisor sees you they're gonna flip.|we already had one duck come through here...|that didn't go over well at all!|look, you need to get a move on.|this is no place for ducks!|not even you duck duck!|oh man i'm going to be in sooo much trouble...|"},
+
+ {who="signpost",spr=24,
+  mouth=-1,mouth_offset=0,
+  c1=4,c2=4,r=4,height=4,
+  cell={71,108},
+  lines="the sign says:|new poctridge|"},
+
+ {who="signpost",spr=24,
+  mouth=-1,mouth_offset=0,
+  c1=4,c2=4,r=4,height=4,
+  cell={103,12},
+  lines="the sign says:|obblesville|"},
+
+ {who="signpost",spr=24,
+  mouth=-1,mouth_offset=0,
+  c1=4,c2=4,r=4,height=4,
+  cell={31,19},
+  lines="the sign says:|ackelsby park|"},
+
+ {who="faded signpost",spr=24,
+  mouth=-1,mouth_offset=0,
+  c1=4,c2=4,r=4,height=4,
+  cell={36,78},
+  lines="the sign says:|pol r1 gf|"}
  }
  
  for npc in all(npcs) do
@@ -1723,34 +1800,34 @@ __gff__
 0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000
 __map__
 f1f1f1f1f1f1f1f1f1e1fc3ca1fcfc8c51fcfc4cd14c31fcfcfc4c24fcfc8f4b4c3b435ca1dc212c415c2ffc2c44234c23344c1e231e6334ac3b3f3a3f2b1f2b1c3b232b333c91bc512c513c14ff3f647344931e23545f6b1f9a1f4b1c434b332c819c912c412c14ff6f547354331e43645f6b1f5a165a1f2b2c434b431c719c
-b13c113cff8f6443746354532f5b2f2a769aa31c619cc16cffaff4547c1334236b2f2a162a16da131e731c518cb14c11ecff1ff434bc24135b3f2af63a831c516c71fcfc8c5fe4ec14135b3f4a163a16aa331e531c415c81fcfcec2f84bc245c14135b3f2a769aa31c413c81bc1f7bfcfcfc2c242b4c236b2fba1f1c2314c31c
-313c81ac1f3b9f3a4f141f44fc7c142f5c231e3b4c137b239a1b2ce32c312c818c5bfafa1a2f1b9f244f4c14134b5c2f5b131f239f1cb31e231f2c312c715c8bda16fa4a2bff3c24232b5c4f6b239f1ce31f2c213c614c2f8b2af6e62a1b33df4c14237c1b4f4b132b138f1c4314431e431f2c213c614c3f1b1f5b2a16aa164a
-165a168a537f53144c138c2b434b1f2b7f2c1fc32f2c214c613c3f7b2a16aa164a165a167a735f6324bc1b331b237b7f1c2f2b832b1f3c217c314c3f5b3a164a1e1b4a164a162a1f2a162a2f3b431e532f331e33248c2b233b237b7f1c3f1b733b1f3c317c214c4f4b2a462a1b1c2a364a162a1f2a162a2f2b431b8324634413
-4f1b234b336b6f2c3f2b534b1f2c418c213c8f3a164a1e1b4a164a162a1f5a1f2b432b73441b934f235b334b1f1b6f1c5f3b233b3f2c41ec4f1b3f2a16fa162a2f3a1f2b334b53447b9f135b1e336b6f1c6f8b2f2c415c1b3c114c2b6f2a16fa162a5f9b73247b9f1b233b1e436b5f2c6f6b4f2c315c3b7c4b4f2a166a564a16
-2a3fab431e532b1f3b8f4b837b5f1cff2f3c212c3b232b3c112c5b5a163a162a163a164a162a2f3b434ba32b2f1b9f5b738b3f2cff3f2c211c3b431b6c3b146a163a162a163a164a162a1f5b334b933b1f1bcf2b1ffb3f1cff4f2c211c1b632b5c4b2a962a163a164a162a8b235b635bcfeb332b2f2cdf2b3f132c211c1b231e
-332b5c4b6a163a162aa62a8b231e6b138b2f131e131e135f1b1fbb432b2f1cdf4b332c211c1b632b1f5c4b5a163a16ba162a13fb7b5f1e3a1e4f5b1f7b532b1f2cdf3b531c211c2b432b2f5c6b1f2a163a16ba162a33fb6b4f131a1e1a134f3b4f5b632b1f1cef2b631c211c137b3f4c3b1f2b1f2a16faea8b2f1b6f1e1a1e1a
-1ebf4b732b2cff731c211c5b1e3b3f3c3b1f2b1f2a16fafa8b8f131a1e1a131f3b3f2b1f5b732b1cff831c211c2b136b4f3c4b2f2ad65ab62a1f5baf1e1a1e1a1e1f3b2fab231e331b2c23cf931c211c9b4f4c3b2f6a166a16ca166a4bcf131a1e1a131f2b6f7b433b1c43bf831e1c211c2b332b6f4c2b4f5a166a164a167a16
-5a4bdf1e3a1ecfab2c43af332b332e1c211c1b439f4c1b7f5a2f2a164a162a3f2a162a1f5bef131e131e13ff7b1c539f1b232b432e1c211c1b131e338f5c8f3a3f7a162a1b2f2a162a1f5bffff5f5b2c538f1b332b332e131c211c1b131e338f1b6c14cf3a132a162a3b2a16caff7f535f431c331e139f1b332b333e1c211c1f
-437f232b6c14af1b432a162a3b2a16daff5fe32c538fa33e1c211c2f238f232b7caf2b231b2a162a3b2ac62aff3ff32c331e336f1ba33e1c212caf432b8c5f8b2a162a3b2a16daff2ff32c1f636f431b732e131c212caf532b9c249b2a162a1f1b1f2a16caff1f932f53141c142f436f532b831e1c213c7f733bec143b1f5a1f
-1b1f5affaf836f342c143f234f833b531e131e1c213c6f331e431f4bfc3c3a5c3a2cdf3b4f3b935f144c247fa31b1e1b731e1c213c5f931f5bfcfcdc4b3f1b631e434f144c148fb33b731e1c213c3fa32f3b1f3b1ffcfcecf33f4c148fe31b931c213c2fa32f8b4ffcfcfca31f5cbff3832c212c2fa34f4b1f4b1f5b141b742b
-7ffccc53fc6cf3532c212c2f431e435f9b2f7b543beffcfcfc8cc33c212c3f231e435ffbbbffbffcac3f83fc2c132c311c4f635ffb1fabffff4f2bff3ff3a34c311c5f436f3b73fbffff5f1bff3ff3d32c311c23df3b93cbffffff9f532b631ef3131c311c23ef4b331e33bbffff3f83cf634bf3732c211c33ef4b739b246f2b
-ff6f532b933f838bf3532c211c43df4b837b544f3bff4f534bf3335bf3a31c211c53df3b837b545b1f2b4f6b6f833bf3432bf3b31e1c211c231e33cf3b531e33fbfb4f631ef3e32ef3232e231e1c211c735f2b5f3b93fb1b1f3b2f3b133b2ff3631ef3431eb31e131e531e1c211c231e933b5f5b431e233b13fb1b2f6b531ed3
-1ef3232e431e131e631e831e131e1c211cf36f5b73fb137bf3f3331e731e333e131e332e131e131e131e132e431c211c732e231e436f5b633b133b13ebf3f3933e132e131e331e131e131e231e131e131e232e231e1c211cf3236f4b63fb7bf3f3f3f3931c211cf3236f4b63fb6b1ff3f3731ed31e531eb31c211cc31e33af2b
-231e33ab1f1b2f3b4ff3f3f3131e131e531e231e231e231e232e131c211c231ec3cf2b631b1fcb7f831eb31ef3b31e531e831e531c211c636bff1f5b231bff6fe31ef3f3431ea32e131e331c211c131e335bff7f5bbf1b3f141b6ff3f3f3431e431e832c211c534bffaf4baf134f131b7fc33b531e835ff3331e631e132c211c
-433bffdf2b9f1bff8b435bb39f433bf3232c211c234b8f2a2f2aef2baf24ef3b136bf313df433bf32c211c5b8f7adf4b1f3a8f1b135f142b2f3b237bb3ff5f933b732c211c4b8f3a362a9f1aa61aff2b2fbb131bffff8f7b532c212c1b1f1b8f2a261a164a1f1a4f2a168a161aef131b2f9b135bffff8f7b132b132c212c3b8f
-2af6261a661a168f13142f1b5f4b137b136b9f13afdb4f5b231b132c212c2b9f2a162a164a2f231a2b1a161a164b161a16ff2ffb1b134b5f143f1b7f4b943b4f5b131b231c212c3b8f2a462a4f333b161a161b2e1b161a161bff1f2b1ffb3b1f1b5f1b8f4bc42b4f6b231c212c3b7f4426343f433b161a161b2e1b161a161b9f
-145f5bce5b1f1b4f149f3b3463442b4f6b231c214c7f342c261c341f531b131b161a164b161a162b8f1b132f141f3b1f1b1eab1e5b1f2bcf3b2433a42b4f3b131b231c216c2f8c264c1f533ba62b13df5b1e1b8e1b1e5b1f2bbf4b2413c43b4f2b132b131c31fc266c535b1426145b238f1b3f5b1e1b1e6b1e1b1e5b2f1b3f13
-1f135f4b2413d42b6f132b131c31fc269c231b231b2426244c23cf5b1e1b1e1b4e1b1e1b1e3b132b3f1b148f4b241364172423342b5f231b131c41ec26fc2c267c13cf5b1e1b1e1b1e2b1e1b1e1b1e7bcf4b84372413342b5f231b131c41ec26fc2c169cbf6b1e1b1e1b1e1b2e1b1e1b1e4b133bbf4b74571413343b4f231b13
-1c51dc268c614c217cbf1b1f4b1e1b1e1b1e4b1e1b1e1b1f6bcf3b44133437241324133b4f431c51dc267ce16caf7b1e1b1e1b6e1b1e5bff4b34134417241334133b4f431c51dc26acb15cbf7b1e1b1e8b1e3b3f1bef3b4413a4133b5f331c41ec26ec417ccf7b1e1bae2b2f2bff1f3b344364233b5f232c41bc3426443ffc2c
-df3b13fb1b2f2b2f13ef4b94434b6f3c318c2f44461a147fdceffb1b1f3b1f2bff3f5b54635b5f4c317c4f341624162a9f5c162cef1b1ffb6b1f1b6f1bdf5b836b4f6c217c6f141a462a4f1a8f1426ff1b1ffb5b7f1bff2ffb1b4f6c315c8f2a16141a161aef241614df2b1fcb1f1b1f2baf142f13ff1fbb5f8c314c9f2a461f
-1aaf142f44df2b1f5b234bcf141b3f14ffff3f8c414cbf267f147f141f441f14bf6b433bff4f1bffff2f8c413caf144f1adf141f1416142f141f149f4b131b333bff131f14ff7fa33f8c413cff2f543f146f341f14cfdbff1bff4ff39c412caf1a8f942f141f24162f24bf3b1f2b131b1f3bffff2ff3538c412cff6f643f241f
-24ff1fabfffff3138a8c312cbf1a1f143f14df442f141f14bf4b2f3bffeff3134a462a8c312cbf1a2f143fb44f24ff2f2b2f3bffef738a135a162a165a5c312cdf242f241f143c243f243f143f14ffff9fb37a565a462a166a5c213cbf243f141f241c113c242f143f24ffffcf238a132a461a161a161b165a162a162a661a5c
-211c1f1cbf242f141f247c543f14ffffbf233a465a162a161a161a161b161a562a162a164c162a4c211c1f2caf143f141f144c111c111c341f141f141f14ffffaf231b1a362a165a162a361a161b161a1633162a461c2b1c162a4c214caf242f341c111c214c441f141f14ffff8f332b1a161a162a361a362a161a161a361a16
-131e13162a162a164c162a4c215c7f141f243f243c311c112c1f241f141f14ffff7f234b1a161a461a361a162a161a163a161a1633462a662a4c215caf144f242c116c341f141f145f14ffbf131e131e131e2b4a164a361a161a461a161a968a164a4c216cef346c341f141f14ffff4f166b5a161a235a166a161a16aa531a16
-2a274c217caf143f541c441f44ffff4ff6f6f6361a473c218cefa42f14ffff5ff6f6f6361a473c219c8f143f143f242f143f245f14ffef166b5a165a231a166a161a131e131e131a162a161a131e131e131a161a473c213c3f4cff1f544f24ffff3f131e131e131e2b4a161a364a162a361a161a531a162a161a531a162a373c
-213c4f4cff7f34ffff9f234b1a361a461a162a1613161a167a162a167a163a273c213c5f4cef94ffffbf332b3a362a362a161e464a461a661a362a273c214c5f4caf145f34ff5f87ff3f231b4a163a161a4613162a662a161a161a162b161a161a162a273c215c5f4cff8f145f145ff7976f234a564a362a161a162a162a161a
-161a162b562a174c216c5f4cffff1ff7f74f33fa1a362a661a465a274c218c4f5cffcfc7fc774f236a433a13fa6a275c219c4ffc1ccf977cd77c471ff3f353376c21ac5ffc1c6f876c477c674c473c77f3b3675c172c21bc7ffc1c775cf78c977c47f353674c374c31ac17bf47fcf7675cf7173cb78387bc41ac376fc76cf7e7
-3cf7176c9743476c773c51ac374f4ca7ccf7776c17ac774c171c976c874c71fc8c476c174c374c572c477c278c275c373c57fc875cc1fcfcfcfcfcfcfc8cf1f1f1f1f1f1f1f1f1000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000
+b13c113cff8f6443746354532f5b2f2a769aa31c619cc16cffaff4547c1334236b2f2a162a16ba242c731c518cb14c11ecff1ff434bc24135b3f2af616143c631c516c71fcfc8c5fe4ec14135b3f4a163a168a243c1e531c415c81fcfcec2f84bc245c14135b3f2a769a133c14531c413c81bc1f7bfcfcfc2c242b4c236b2f6a
+164a1f1c2314431c731c313c81ac1f3b9f3a4f141f44fc7c142f5c231e3b4c137b234a3f2a1b2ce32c312c818c5bfafa1a2f1b9f244f4c14134b5c2f5b131f239f1cb31e231f2c312c715c8bda16fa2a2f2bff3c24232b5c4f6b239f1ce31f2c213c614c2f8b2af6e62f1b33df4c14237c1b4f4b132b138f1c4314431e431f2c
+213c614c3f1b1f5b2a16aa164a165a166a2f537f53144c138c2b434b1f2b7f2c1fc32f2c214c613c3f7b2a16aa164a165a167a735f6324bc1b331b237b7f1c2f2b832b1f3c217c314c3f5b3a164a1e1b4a164a162a1f2a162a2f3b431e532f331e33248c2b233b237b7f1c3f1b733b1f3c317c214c4f4b2a462a1b1c2a364a16
+2a1f2a162a2f2b431b83246344134f1b234b336b6f2c3f2b534b1f2c418c213c8f3a164a1e1b4a164a162a1f1a3f1a1f2b432b73441b934f235b334b1f1b6f1c5f3b233b3f2c41ec4f1b3f2a16fa162a6f2b334b53447b9f135b1e336b6f1c6f8b2f2c415c1b3c114c2b6f2a16fa162a5f9b73247b9f1b233b1e436b5f2c6f6b
+4f2c315c3b7c4b4f2a166a564a162a3fab431e532b1f3b8f4b837b5f1cff2f3c212c3b232b3c112c5b5a163a162a163a164a162a2f3b434ba32b2f1b9f5b738b3f2cff3f2c211c3b431b6c3b142f4a163a162a163a164a162a1f5b334b933b1f1bcf2b1ffb3f1cff4f2c211c1b632b5c4b2f962a163a164a162a8b235b635bcf
+eb332b2f2cdf2b3f132c211c1b231e332b5c4b2f4a163a162aa62a8b231e6b138bcf1b1fbb432b2f1cdf4b332c211c1b632b1f5c4b5a163a16ba162a13fb7bef5b1f7b532b1f2cdf3b531c211c2b432b2f5c6b1f2a163a16ba162a33fb6bdf3b4f5b632b1f1cef2b631c211c137b3f4c3b1f2b1f2a16faea8b2f1bff7f4b732b
+2cff731c211c5b1e3b3f3c3b1f2b1f2a16fada2f8bef3b3f2b1f5b732b1cff831c211c2b136b4f3c4b2f2ad65ab63f5bff1f3b2fab231e331b2c23cf931c211c9b4f4c3b2f6a166a16ca164a2f4bff3f2b6f7b433b1c43bf831e1c211c2b332b6f4c2b4f5a166a164a167a165a4bffffab2c43af332b531c211c1b439f4c1b7f
+1a3f1a2f2a164a162a3f2a162a1f5bffff4f7b1c539f1b232b431e131c211c1b131e338f5cef1a3f3a162a1b2f2a162a1f5bffff5f5b2c538f1b332b631c211c1b131e338f1b6c14ff132a162a3b2a16caff7f535f431c331e139f1b332b531e1c211c1f437f232b6c14af1b432a162a3b2a16baff7fe32c538fa31e231c211c
+2f238f232b7caf2b231b2a162a3b2ac6ff5ff32c331e336f1bc31e1c212caf432b8c5f8b2a162a3b2a16baff4ff32c1f636f431b831e131c212caf532b9c249b2a162a1f1b1f2a16caff1f932f53141c142f436f532b931c213c7f733bec143b1f1a3f1a1f1b1f5affaf836f342c143f234f833b531e231c213c6f331e431f4b
+fc3c3f5c3a2cdf3b4f3b935f144c247fa31b1e1b731e1c213c5f931f5bfcfcdc4b3f1b631e434f144c148fb33b831c213c3fa32f3b1f3b1ffcfcecf33f4c148fe31b931c213c2fa32f8b4ffcfcfca31f5cbff3832c212c2fa34f4b1f4b1f5b141b742b7ffccc53fc6cf3532c212c2f431e435f9b2f7b543beffcfcfc8cc33c21
+2c3f231e435ffbbbffbffcac3f83fc2c132c311c4f635ffb1fabffff4f2bff3ff3a34c311c5f436f3b73fbffff5f1bff3ff3d32c311c23cf3ba3cbffffff9f532b631ef3131c311c23bf3b731e33bbffff3f83cf634bf3732c211c339f3bd39b246f2bff6f532b933f838bf3532c211c437f4be37b544f3bff4f534bf3335bf3
+a31c211c535f4bf37b545b1f2b4f6b6f833bf3432bf3b31e1c211c231e333f4bd31e33fbfb4f631ef3e31ef3431e331c211c735b834b73fb1b1f3b2f3b133b2ff3631ef3f3131e131e631c211c231e834b436b431e233b13fb1b2f6b531ed31ef3831e831e831e131e1c211cf3436b83fb137bf3f3331ec31e231e431e531e13
+1e531c211c732e231e736b833b133b13ebf3f3931ee31e431e131e331e231e1c211cf3436b83fb7bf3f3f3f3931c211cf3534b93fb6b1ff3f3731ed31e531eb31c211ca33bf3231e33ab1f1b2f3b4ff3f3f3331e531e531e231e531c211c231e533bf3931b1fcb7f831eb31ef3f3f3231c211c638bf3232b231bff6fe31ef3f3
+431eb31e131e331c211c131e335b3f3b4f839bbf1b3f141b6ff3f3f3931e832c211c534bffaf4baf134f131b7fc33b531e835ff3a31e132c211c433bffdf2b9f1bff8b435bb39f433bf3232c211c234b8f2a2f2aef2baf24ef3b136bf313df433bf32c211c5b8f7adf4b1f3a8f1b135f142b2f3b237bb3ff5f933b732c211c4b
+8f3a362a9f1aa61aff2b2fbb131bffff8f7b532c212c1b1f1b8f2a261a164a1f1a4f2a168a161aef131b2f9b135bffff8f7b132b132c212c3b8f2af6261a661a168f13142f1b5f4b137b136b9f13afdb4f5b231b132c212c2b9f2a162a164a2f231a2b1a161a164b161a16ff2ffb1b134b5f143f1b7f4b943b4f5b131b231c21
+2c3b8f2a462a4f333b161a161b2e1b161a161bff1f2b1ffb3b1f1b5f1b8f4bc42b4f6b231c212c3b7f4426343f433b161a161b2e1b161a161b9f145f5bce5b1f1b4f149f3b3463442b4f6b231c214c7f342c261c341f531b131b161a164b161a162b8f1b132f141f3b1f1b1eab1e5b1f2bcf3b2433a42b4f3b131b231c216c2f
+8c264c1f533ba62b13df5b1e1b8e1b1e5b1f2bbf4b2413c43b4f2b132b131c31fc266c535b1426145b238f1b3f5b1e1b1e6b1e1b1e5b2f1b3f131f135f4b2413d42b6f132b131c31fc269c231b231b2426244c23cf5b1e1b1e1b4e1b1e1b1e3b132b3f1b148f4b241364172423342b5f231b131c41ec26fc2c267c13cf5b1e1b
+1e1b1e2b1e1b1e1b1e7bcf4b84372413342b5f231b131c41ec26fc2c169cbf6b1e1b1e1b1e1b2e1b1e1b1e4b133bbf4b74571413343b4f231b131c51dc268c614c217cbf1b1f4b1e1b1e1b1e4b1e1b1e1b1f6bcf3b44133437241324133b4f431c51dc267ce16caf7b1e1b1e1b6e1b1e5bff4b34134417241334133b4f431c51
+dc26acb15cbf7b1e1b1e8b1e3b3f1bef3b4413a4133b5f331c41ec26ec417ccf7b1e1bae2b2f2bff1f3b344364233b5f232c41bc3426443ffc2cdf3b13fb1b2f2b2f13ef4b94434b6f3c318c2f44461a147fdceffb1b1f3b1f2bff3f5b54635b5f4c317c4f341624162a9f5c162cef1b1ffb6b1f1b6f1bdf5b836b4f6c217c6f
+141a462a4f1a8f1426ff1b1ffb5b7f1bff2ffb1b4f6c315c8f2a16141a161aef241614df2b1f3b138b1f1b1f2baf142f13ff1fbb5f8c314c9f2a461f1aaf142f44df2b1f5b234bcf141b3f14ffff3f8c414cbf267f147f141f441f14bf6b433bff4f1bffff2f8c413caf144f1adf141f1416142f141f149f4b131b333bff131f
+14ff7fa33f8c413cff2f543f146f341f14cfdbff1bff4ff39c412caf1a8f942f141f24162f24bf3b1f2b131b1f3bffff2ff3538c412cff6f643f241f24ff1fabfffff3138a8c312cbf1a1f143f14df442f141f14bf4b2f3bffeff3134a462a8c312cbf1a2f143fb44f24ff2f2b2f3bffef738a135a162a165a5c312cdf242f24
+1f143c243f243f143f14ffff9fb37a565a462a166a5c213cbf243f141f241c113c242f143f24ff5f1bff6f238a132a461a161a161b165a162a162a661a5c211c1f1cbf242f141f247c543f14ff3f1bff7f233a465a162a161a161a161b161a562a162a164c162a4c211c1f2caf143f141f144c111c111c341f141f141f14ffff
+af231b1a362a165a162a361a161b161a1633162a461c2b1c162a4c214caf242f341c111c214c441f141f14ef1b1f2b3f2bff332b1a161a162a361a362a161a161a361a16131e13162a162a164c162a4c215c7f141f243f243c311c112c1f241f141f14ff5f5b2f1b9f234b1a161a461a361a162a161a163a161a1633462a662a
+4c215caf144f242c116c341f141f145f146f1b1fab8f131e131e131e2b4a164a361a161a461a161a968a164a4c216cef346c341f141f14ef1b1f1b134b132b9f166b5a161a235a166a161a16aa531a162a274c217caf143f541c441f44ff1f3b134b2f1b7ff6f6f6361a473c218cefa42f14ff3f5bcff6f6f6361a473c219c8f
+143f143f242f143f245f149f1b3f1b5f1b9f166b5a165a231a166a161a131e131e131a162a161a131e131e131a161a473c213c3f4cff1f544f24ffff3f131e131e131e2b4a161a364a162a361a161a531a162a161a531a162a373c213c4f4cff7f34ffff9f234b1a361a461a162a1613161a167a162a167a163a273c213c5f4c
+ef94ffffbf332b3a362a362a161e464a461a661a362a273c214c5f4caf145f34ff5f87ff3f231b4a163a161a4613162a662a161a161a162b161a161a162a273c215c5f4cff8f145f145ff7976f234a564a362a161a162a162a161a161a162b562a174c216c5f4cffff1ff7f74f33fa1a362a661a465a274c218c4f5cffcfc7fc
+774f236a433a13fa6a275c219c4ffc1ccf977cd77c471ff3f353376c21ac5ffc1c6f876c477c674c473c77f3b3675c172c21bc7ffc1c775cf78c977c47f353674c374c31ac17bf47fcf7675cf7173cb78387bc41ac376fc76cf7e73cf7176c9743476c773c51ac374f4ca7ccf7776c17ac774c171c976c874c71fc8c476c174c
+374c572c477c278c275c373c57fc875cc1fcfcfcfcfcfcfc8cf1f1f1f1f1f1f1f1f100000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000
 0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000
 0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000
 0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000
