@@ -66,15 +66,15 @@ end
 
 function add_biome(
  colour,tree_range,bush_props,transition,footprints)
- local b={}
- b.tree_range=tree_range
- b.transition=transition
- b.bush_props = bush_props
- b.footprints=footprints[1]
- b.foot_sfx=footprints[2]
- b.building_freq=0
  
- biomes[colour]=b
+ biomes[colour]={
+ tree_range=tree_range,
+ transition=transition,
+ bush_props = bush_props,
+ footprints=footprints[1],
+ foot_sfx=footprints[2],
+ building_freq=0
+ }
 end
 
 function _init()
@@ -90,13 +90,15 @@ function _init()
  perspective_offset={64,80}
  height_mult=0.015
  
- cells={}
- cells.w=32
- cells.h=32
+ cells={
+ w=32,
+ h=32,
+ bounds={128,128},
+ bound_str=2
+ }
  cells.fill_x=flr(128/cells.w+0.5)
  cells.fill_y=flr(128/cells.h+0.5)
- cells.bounds={128,128}
- cells.bound_str=2
+ 
  
  biomes={}
  --empty biomes
@@ -113,62 +115,67 @@ function _init()
  add_biome(7,{0,0.1},{0.1,0,{}},true,{true,3})
  add_biome(11,{0.1,0.3},{0.5,0.8,{8,12,13,10}},true,{true,0})
  add_biome(15,{0,0.2},{0.2,0.2,{11,13}},true,{true,3})
-
  add_biome(10,{0,0},{0,0,{}},true,{true,3})
+
  biomes[10].building_freq=0.8
  biomes[15].building_freq=0.01
  
- trees={}
- trees.height_range={10,25}
- trees.girth_range={4,10}
- trees.gap=16
+ trees={
+ height_range={10,25},
+ girth_range={4,10},
+ gap=16
+ }
  
- clouds={}
- clouds.a={}
- clouds.height_range={45,50}
- clouds.count_range={20,40}
- clouds.radius_range={5,15}
- clouds.cluster_range={5,7}
- clouds.w=256
- clouds.h=256
+ clouds={
+ a={},
+ height_range={45,50},
+ count_range={20,40},
+ radius_range={5,15},
+ cluster_range={5,7},
+ w=256,
+ h=256
+ }
  
+ bushes={
+ height_range={0.5,1.5},
+ count_range={10,30},
+ radius_range={1,2.5},
+ cluster_range={2,4}
+ }
  
- bushes={}
- bushes.height_range={0.5,1.5}
- bushes.count_range={10,30}
- bushes.radius_range={1,2.5}
- bushes.cluster_range={2,4}
- 
- buildings={}
- buildings.height_range={10,35}
- buildings.w_range={8,min(cells.w,cells.h)-16}
- buildings.h_range={8,min(cells.w,cells.h)-16}
- buildings.colours={8,9,6}
+ buildings={
+ height_range={10,35},
+ w_range={8,min(cells.w,cells.h)-16},
+ h_range={8,min(cells.w,cells.h)-16},
+ colours={8,9,6}
+ }
  
  --player
- p={}
- p.p=v_mul({5,5},32)
- p.v={0,0}
- p.speed={0.7,0.7}
- p.max_speed=3
- p.cur_speed=0
- p.damping=0.8
- p.a=0.75
- p.a_o=0
- p.stride_w=4
- p.stride_l=12
- p.stride_alt=false
- p.height=4
- p.quack_timer=0
- p.c={0,0,0}
- p.duck=-1
- p.ducklings={}
- 
+ p={
+ p=v_mul({82,16},32),
+ v={0,0},
+ speed={2.7,2.7},
+ max_speed=10,
+ cur_speed=0,
+ damping=0.8,
+ a=0.75,
+ a_o=0,
+ stride_w=4,
+ stride_l=12,
+ stride_alt=false,
+ height=4,
+ quack_timer=0,
+ c={0,0,0},
+ duck=-1,
  ducklings={}
- ducklings.height=3
- ducklings.r=2
- ducklings.found=0
- ducklings.found_timer=0
+ }
+ 
+ ducklings={
+ height=3,
+ r=2,
+ found=0,
+ found_timer=0
+ }
  
  add(ducklings,{
   p={10,10}
@@ -195,12 +202,13 @@ function _init()
  p.r=4 
  p.r2=p.r*p.r
  -- camera
- cam={}
- cam.p=v_sub(p.p,{64,64+128})
- cam.c={0,0}
+ cam={
+ p=v_sub(p.p,{64,64+128}),
+ c={0,0},
+ offset={64,64},
+ sway={0.25,0.25,8,9}
+ }
  cam.p_o=cam.p
- cam.offset={64,64}
- cam.sway={0.25,0.25,8,9}
  
  cells.current={
   flr(cam.p[1]/cells.w),
@@ -246,12 +254,12 @@ function _init()
  
  
  footprints={
-  {p.p[1],p.p[2]+p.stride_w,p.p[1],p.p[2]+p.stride_w},
-  {p.p[1],p.p[2]-p.stride_w,p.p[1],p.p[2]-p.stride_w}
+  {0,0},
+  {0,0},
+  max=64,
+  remove_delay=0.25,
+  remove_last=time()
  }
- footprints.max=64
- footprints.remove_delay=0.25
- footprints.remove_last=time()
  for i=3,footprints.max-1,2 do
   footprints[i]=footprints[1]
   footprints[i+1]=footprints[2]
@@ -266,12 +274,14 @@ function _init()
   local y=rnd(clouds.h*2)
   local r=0
   for j=1,range(clouds.cluster_range) do
-   local c={}
-   c.r=range(clouds.radius_range)
+   local c={
+    r=range(clouds.radius_range),
+   }
    c.p={
     x+range({1,(c.r+r)/2})-range({1,(c.r+r)/2}),
     y+range({1,(c.r+r)/2})-range({1,(c.r+r)/2})
    }
+   
    if rnd() > 0.5 then
     x=c.p[1]
     y=c.p[2]
@@ -287,7 +297,7 @@ function _init()
  
  
  
- -- npc sprite
+ -- npcs
  npcs={
  	{who="drake",spr=1,
  	mouth=-1,mouth_offset=0,
@@ -347,11 +357,7 @@ function _init()
  
  for npc in all(npcs) do
   npc.p={rnd(cells.w),rnd(cells.h)}
-  --npc.c1=rnd(16)%8+8
-  --npc.c2=rnd(16)%8+8
-  --npc.r=rnd(3)+2
   npc.r2=npc.r*npc.r
-  --npc.height=6
   
   if npc.cell==nil then
    npc.cell={flr(rnd(cells.bounds[1])),flr(rnd(cells.bounds[2]))}
@@ -402,12 +408,13 @@ function _init()
   npc.lastline = sub(npc.lines,l,#npc.lines)
  end
  
- talk={}
- talk.npc=nil
- talk.bounce=0
- talk.say=""
- talk.said=""
- talk.offset_target=40
+ talk={
+  npc=nil,
+  bounce=0,
+  say="",
+  said="",
+  offset_target=40
+ }
  talk.offset=-talk.offset_target
  
  menu=0
@@ -463,16 +470,17 @@ function init_cells()
  if c.c==14 then
   -- boundaries
   c.c=3
-  local t={}
-  t.height=range(trees.height_range)
-  t.girth=min(cells.w,cells.h)*2/5
-  t.p={
-   cells.w/2,
-   cells.h/2
+  local t={
+   height=range(trees.height_range),
+   girth=min(cells.w,cells.h)*2/5,
+   p={
+    cells.w/2,
+    cells.h/2
+   },
+   leaves={{0,0},{0,0},{0,0}}
   }
   t.s=t.p
    
-  t.leaves={{0,0},{0,0},{0,0}}
   add(c.trees,t)
  else
   -- normal cell
@@ -481,18 +489,19 @@ function init_cells()
   for x=0,cells.w-trees.gap,trees.gap do
   for y=0,cells.h-trees.gap,trees.gap do
    if rnd() < tree_freq then
-    local t={}
-    t.height=range(trees.height_range)
-    t.girth=range(trees.girth_range)
-    t.p={
-     x+rnd(trees.gap),
-     y+rnd(trees.gap)
+    local t={
+     height=range(trees.height_range),
+     girth=range(trees.girth_range),
+     p={
+      x+rnd(trees.gap),
+      y+rnd(trees.gap)
+     },
+     leaves={{0,0},{0,0},{0,0}}
     }
     t.p[1]=mid(t.girth,t.p[1],cells.w-t.girth)
     t.p[2]=mid(t.girth,t.p[2],cells.h-t.girth)
     
     t.s=t.p
-    t.leaves={{0,0},{0,0},{0,0}}
     add(c.trees,t)
    end
   end
@@ -506,8 +515,9 @@ function init_cells()
    local bloom_colours=c.biome.bush_props[3]
    local colour=bloom_colours[flr(rnd(#bloom_colours))%#bloom_colours+1]
    for j=1,range(bushes.cluster_range) do
-    local b={}
-    b.r=range(bushes.radius_range)
+    local b={
+     r=range(bushes.radius_range)
+    }
     b.p={
      x+range({1,(b.r+r)})-range({1,(b.r+r)/2}),
      y+range({1,(b.r+r)})-range({1,(b.r+r)/2})
@@ -521,12 +531,13 @@ function init_cells()
     b.c=colour
     
     if rnd() < c.biome.bush_props[2] then
-     local bloom={}
      local a=rnd()
      local r=rnd(b.r/2)+b.r/4
-     bloom.p={
-      r*cos(a),
-      r*sin(a)
+     local bloom={
+      p={
+       r*cos(a),
+       r*sin(a)
+      }
      }
      b.bloom = bloom
     else
@@ -543,15 +554,16 @@ function init_cells()
    #c.bushes + #c.trees == 0 and
    rnd() < c.biome.building_freq
   then
-   c.building={}
-   c.building.size={
-    range(buildings.w_range),
-    range(buildings.h_range)
+   c.building={
+    size={
+     range(buildings.w_range),
+     range(buildings.h_range)
+    },
+    p={cells.w/2,cells.h/2},
+    height=range(buildings.height_range),
+    c=buildings.colours[flr(rnd(16))%#buildings.colours+1]
    }
-   c.building.p={cells.w/2,cells.h/2}
-   c.building.height=range(buildings.height_range)
    c.building.s=v_sub(c.building.p,p.p)
-   c.building.c=buildings.colours[flr(rnd(16))%#buildings.colours+1]
   end
  
  end
@@ -561,12 +573,12 @@ function init_cells()
 end
 
 function add_blob(p,r)
- local blob={}
- blob.hit = false
- blob.p = p
- blob.r = r
- blob.r2=blob.r*blob.r
- add(blobs,blob)
+ add(blobs,{
+ hit=false,
+ p=p,
+ r=r,
+ r2=r*r
+ })
 end
 
 function _update()
@@ -782,8 +794,8 @@ function update_trees()
  local ts=cells.a[x][y].trees
  
  local cellp = {
- cam.p[1]%cells.w-x*cells.w,
- cam.p[2]%cells.h-y*cells.h
+  cam.p[1]%cells.w-x*cells.w,
+  cam.p[2]%cells.h-y*cells.h
  }
  
  for t in all(ts) do
@@ -869,28 +881,30 @@ function update_buildings()
   local s1=max(b.size[1],b.size[2])
   local s2=min(b.size[1],b.size[2])
   for i=-s1+s2/2,s1-s2/2,s2 do
-   local blob={}
-   blob.hit = false
-   blob.p = v_add({(cells.current[1]+x)*cells.w,(cells.current[2]+y)*cells.h},b.p)
+   local blob={
+    hit = false,
+    p = v_add({(cells.current[1]+x)*cells.w,(cells.current[2]+y)*cells.h},b.p),
+    r = s2,
+    r2=s2*s2
+   }
    if s1==b.size[1] then
     blob.p[1]+=i
    else
     blob.p[2]+=i
    end
-   blob.r = s2
-   blob.r2=blob.r*blob.r
    add(blobs,blob)
   end
-  local blob={}
-  blob.hit = false
-  blob.p = v_add({(cells.current[1]+x)*cells.w,(cells.current[2]+y)*cells.h},b.p)
+  local blob={
+   hit = false,
+   p = v_add({(cells.current[1]+x)*cells.w,(cells.current[2]+y)*cells.h},b.p),
+   r = s2,
+   r2=s2*s2
+  }
   if s1==b.size[1] then
    blob.p[1]+=s1-s2/2
   else
    blob.p[2]+=s1-s2/2
   end
-  blob.r = s2
-  blob.r2=blob.r*blob.r
   if v_dist(blob.p,blobs[#blobs].p)>2 then
    add(blobs,blob)
   end
