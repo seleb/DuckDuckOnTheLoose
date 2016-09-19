@@ -91,12 +91,10 @@ function _init()
  height_mult=0.015
  
  cell_size=32
- cells={
- bounds={128,128},
- bound_str=2
- }
- cells.fill_x=flr(128/cell_size+0.5)
- cells.fill_y=flr(128/cell_size+0.5)
+ cells={}
+ cell_bounds={128,128}
+ cell_bound_str=2
+ cell_fill=flr(128/cell_size+0.5)
  
  
  biomes={}
@@ -231,14 +229,14 @@ function _init()
  
  -- convert mapstring->2d array
  mapdata={}
- local x=cells.bounds[1]-1
+ local x=cell_bounds[1]-1
  local y=-1
  while #mapdata_string > 0 do
   x+=1
-  if x==cells.bounds[1] then
+  if x==cell_bounds[1] then
    x=0
    y+=1
-   if y==cells.bounds[2] then
+   if y==cell_bounds[2] then
     break
    end
    mapdata[y]={}
@@ -460,7 +458,7 @@ function _init()
   npc.r2=npc.r*npc.r
   
   if npc.cell==nil then
-   npc.cell={flr(rnd(cells.bounds[1])),flr(rnd(cells.bounds[2]))}
+   npc.cell={flr(rnd(cell_bounds[1])),flr(rnd(cell_bounds[2]))}
   
    -- put unset npcs in top-left
    npc.cell={flr(rnd"6"),flr(rnd"6")}
@@ -524,9 +522,9 @@ function init_cells()
  
  
  cells.a={}
- for a=0,cells.fill_x do
+ for a=0,cell_fill do
  cells.a[a]={}
- for b=0,cells.fill_y do
+ for b=0,cell_fill do
  local c={}
  cells.a[a][b]=c
  
@@ -534,10 +532,10 @@ function init_cells()
  local y=b+cells.current[2]
  
  -- seed the rng based on cell position
- c.seed=seed+x*(cells.bounds[1]*2)+y
+ c.seed=seed+x*(cell_bounds[1]*2)+y
  srand(c.seed)
  
- if x<0 or x>cells.bounds[1]-1 or y<0 or y>cells.bounds[2]-1 then
+ if x<0 or x>cell_bounds[1]-1 or y<0 or y>cell_bounds[2]-1 then
   c.c=1
  else
   c.c=mapdata[y][x]
@@ -549,7 +547,7 @@ function init_cells()
  for u=-1,1 do
   c.edges[u]={}
  for v=-1,1 do
-  if x+u<0 or x+u>cells.bounds[1]-1 or y+v<0 or y+v>cells.bounds[2]-1 then
+  if x+u<0 or x+u>cell_bounds[1]-1 or y+v<0 or y+v>cell_bounds[2]-1 then
    c.edges[u][v]=1
   else
    c.edges[u][v]=mapdata[y+v][x+u]
@@ -873,23 +871,23 @@ function update_collision()
  -- boundaries
  local x=p.p[1]/cell_size
  local y=p.p[2]/cell_size
- if x > cells.bounds[1] then
-  p.v[1] -= (x-cells.bounds[1])*cells.bound_str
+ if x > cell_bounds[1] then
+  p.v[1] -= (x-cell_bounds[1])*cell_bound_str
  elseif x < 0 then
-  p.v[1] -= x*cells.bound_str
+  p.v[1] -= x*cell_bound_str
  end
  
- if y > cells.bounds[2] then
-  p.v[2] -= (y-cells.bounds[2])*cells.bound_str
+ if y > cell_bounds[2] then
+  p.v[2] -= (y-cell_bounds[2])*cell_bound_str
  elseif y < 0 then
-  p.v[2] -= y*cells.bound_str
+  p.v[2] -= y*cell_bound_str
  end
 end
 
 function update_trees()
  
- for x=0,cells.fill_x do
- for y=0,cells.fill_y do
+ for x=0,cell_fill do
+ for y=0,cell_fill do
  
  local ts=cells.a[x][y].trees
  
@@ -945,8 +943,8 @@ function update_clouds()
 end
 
 function update_bushes()
- for x=0,cells.fill_x do
- for y=0,cells.fill_y do
+ for x=0,cell_fill do
+ for y=0,cell_fill do
  
  local bs=cells.a[x][y].bushes
  
@@ -968,8 +966,8 @@ end
 
 
 function update_buildings()
- for x=0,cells.fill_x do
- for y=0,cells.fill_y do
+ for x=0,cell_fill do
+ for y=0,cell_fill do
  
  local b=cells.a[x][y].building
  
@@ -1217,8 +1215,8 @@ end
 function draw_bg()
  camera(cam.p[1],cam.p[2])
  
- for a=0,cells.fill_x do
- for b=0,cells.fill_y do
+ for a=0,cell_fill do
+ for b=0,cell_fill do
  
  x=(cells.current[1]+a)*cell_size
  y=(cells.current[2]+b)*cell_size
@@ -1330,8 +1328,8 @@ function draw_player(shadow)
 end
 
 function draw_trees(shadows)
- for a=0,cells.fill_x do
- for b=0,cells.fill_y do
+ for a=0,cell_fill do
+ for b=0,cell_fill do
  
  local trees=cells.a[a][b].trees
  camera(
@@ -1376,8 +1374,8 @@ function draw_trees(shadows)
 end
 
 function draw_buildings(shadows) 
- for x=0,cells.fill_x do
- for y=0,cells.fill_y do
+ for x=0,cell_fill do
+ for y=0,cell_fill do
  
  local b=cells.a[x][y].building
  
@@ -1431,8 +1429,8 @@ function draw_clouds(shadows)
 end
  
 function draw_bushes(shadows)
- for a=0,cells.fill_x do
- for b=0,cells.fill_y do
+ for a=0,cell_fill do
+ for b=0,cell_fill do
  
  local bushes=cells.a[a][b].bushes
  camera(
@@ -1491,16 +1489,16 @@ end
 function draw_debug()
  --cells
  camera(cam.p[1],cam.p[2])
- for x=cells.current[1],cells.current[1]+cells.fill_x do
- for y=cells.current[2],cells.current[2]+cells.fill_y do
+ for x=cells.current[1],cells.current[1]+cell_fill do
+ for y=cells.current[2],cells.current[2]+cell_fill do
  
  local cell=cells.a[x-cells.current[1]][y-cells.current[2]]
  
  if x==cells.current[1] and y==cells.current[2] then
   color"10"
  elseif
-  x>=cells.bounds[1] or
-  y>=cells.bounds[2] or
+  x>=cell_bounds[1] or
+  y>=cell_bounds[2] or
   x<=-1 or
   y<=-1 then
   color"8"
@@ -1685,10 +1683,9 @@ function draw_found()
 end
 
 function print_ol(s,x,y,c1,c2)
- color(c1)
  for u=x-1,x+1 do
  for v=y-1,y+1 do
-  print(s,u,v)
+  print(s,u,v,c1)
  end
  end
  print(s,x,y,c2)
