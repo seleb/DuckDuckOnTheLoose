@@ -328,11 +328,15 @@ function _init()
 
  	{who="giddy girl",spr=13,
  	mouth=0,mouth_offset=2,
- 	c1=10,c2=8,r=3,height=2},
+ 	c1=10,c2=8,r=3,height=2,
+  cell={101,8},
+  lines="hey duck duck!|whatcha up to?|are you playing a game?|can i play too?!|i'm really good at games!!|my parents said i can't leave the city though.|does that mean i can't play with you?|...|what's it like outside?|are there lots of kids like me?|or are they all ducks like you?|that'd be weird!|i'm glad i'm not a duck.|...|...|could i go out on my own like you if i was a duck?|"},
 
- 	{who="hipster",spr=12,
+ 	{who="helenista",spr=12,
  	mouth=0,mouth_offset=0,
- 	c1=13,c2=15,r=3,height=4},
+ 	c1=13,c2=15,r=3,height=4,
+  cell={50,39},
+  lines="hmph.\nduck duck.|i see you're doing well.|...|...|don't think i've forgotten what happened last time.|things don't just fix themselves overnight.|i certainly haven't forgiven you either.|...|look, i appreciate you're making an effort...|but i can't do this right now.|-you- can't do this right now.|i've heard the rumours.|i see the way you walk through town.|more importantly:\ni know you duck duck.|do you even know how long it's been?|do you care?|of course you don't.|you never did.|maybe someday you'll realize why that matters.|i hope, for your sake, that you do.|until then, i'd really rather not talk to you.|...|...|just... just drop it, duck duck.|"},
 
  	{who="tommy tim-tom",spr=11,
  	mouth=0,mouth_offset=0,
@@ -354,7 +358,7 @@ function _init()
   mouth=0,mouth_offset=0,
   c1=4,c2=4,r=3,height=2,
   cell={23,61},
-  lines="greetings duck duck.|the young of your kind is very disruptful.|the peaceful clearing should not be disrupted.|please leave, and take the young with you.|"},
+  lines="greetings duck duck.|your kind is very disruptful.|the peaceful clearing should not be disrupted.|please leave, and take your kin with you.|"},
 
   {who="pupperoni",spr=8,
   mouth=0,mouth_offset=0,
@@ -366,7 +370,7 @@ function _init()
   mouth=0,mouth_offset=0,
   c1=4,c2=4,r=3,height=2,
   cell={24,62},
-  lines="hey duck duck.|sorry about the others.|they take the \"peaceful clearing\" very seriously.|"},
+  lines="hey duck duck.|sorry about the others.|they take the \"peaceful clearing\" very seriously.|you don't really need to worry.|they're too lazy to kick you out themselves.|but you should probably head out anyway.|talk to you later duck duck."},
 
  	{who="?",spr=7,
  	mouth=0,mouth_offset=0,
@@ -376,11 +380,13 @@ function _init()
  	mouth=2,mouth_offset=0,
  	c1=8,c2=10,r=4,height=3,
   cell={107,8},
-  lines="hi there! you must be duck duck.|are you looking for those ducklings from earlier?|i think most of them left already.|they were super cute!|...|...|do you ever wonder if you waited too late to have kids?|ha ha! me neither!|...|...|"},
+  lines="hi there! you must be duck duck.|are you looking for those ducklings from earlier?|i think most of them left already.|they were super cute!|...|...|do you ever wonder if you waited too late to have kids?|...|ha ha! me neither!|...|...|life here is pretty nice, don't you think?|"},
 
  	{who="buddy boy",spr=5,
  	mouth=0,mouth_offset=2,
- 	c1=12,c2=15,r=3,height=2},
+ 	c1=12,c2=15,r=3,height=2,
+  cell={26,26},
+  lines="duck duck!|ha ha!|hey, guess what?|can you guess?|i bet you can't!\nha ha!|you're a duck!|ha ha!|"},
 
  	{who="ranger",spr=4,
  	mouth=0,mouth_offset=0,
@@ -392,7 +398,7 @@ function _init()
   mouth=0,mouth_offset=0,
   c1=5,c2=4,r=4,height=4,
   cell={37,26},
-  lines="hello duck duck!|how are you today?|i'm taking a personal day...|get me some me time, you know?|oh, speaking of which...|i saw a couple ducklings strolling through town.|looked like they were making a day of it!|i doubt they stuck around though.|not much space around here...|anyway, nice catching up with you.|make sure to hit me up next time you're in town!|...|...|...i wonder if i should get a new scarf...|"},
+  lines="hello duck duck!|how are you today?|i'm taking a personal day...|get me some me time, you know?|oh, speaking of which...|i saw a couple ducklings strolling through town.|looked like they were making a day of it!|i doubt they both stuck around though.|not much space around here...|anyway, nice catching up with you.|make sure to hit me up next time you're in town!|...|...|...i wonder if i should get a new scarf...|"},
 
  {who="mountain climber",spr=16,
   mouth=0,mouth_offset=0,
@@ -403,8 +409,26 @@ function _init()
  {who="worker",spr=31,
   mouth=-1,mouth_offset=0,
   c1=10,c2=12,r=4,height=4,
+  cell={18,84},
+  lines="what's up duck duck?|oh...|oh hey! check it out!|duck duck's on the dock!|heh.|hehe!|ha ha ha ha!|haaa...|man, i crack myself up.|"},
+
+ {who="worker",spr=31,
+  mouth=-1,mouth_offset=0,
+  c1=10,c2=12,r=4,height=4,
   cell={32,100},
   lines="duck duck?! you shouldn't be out here!|it's really dangerous!|you aren't wearing protective gear or anything!|ohhh - if my supervisor sees you they're gonna flip.|we already had one duck come through here...|that didn't go over well at all!|look, you need to get a move on.|this is no place for ducks!|not even you duck duck!|oh man i'm going to be in sooo much trouble...|"},
+
+ {who="debbie",spr=28,
+  mouth=0,mouth_offset=0,
+  c1=2,c2=4,r=4,height=4,
+  cell={64,88},
+  lines="have you seen this garden maze duck duck?|i thought it'd be fun to explore...|but you can just walk between the trees!|it's kind of lame, honestly.|major let-down. a 6/10 at best.|you can quote me on that.|looks like that feathery kid had fun at least.|so not a total waste of space.|...|i wonder who organized this thing...|"},
+
+ {who="curious child",spr=27,
+  mouth=0,mouth_offset=0,
+  c1=3,c2=4,r=3,height=2,
+  cell={106,6},
+  lines="um, you're duck duck, right?|my dad said i'm not supposed to talk to strangers...|especially ones from out of town...|but can i ask you something?|um...|do i reaaalllly need to go to bed when the sun goes down?|cause sometimes, i'm just not tired!|...|i think my dad's a liar.|"},
 
  {who="signpost",spr=24,
   mouth=-1,mouth_offset=0,
