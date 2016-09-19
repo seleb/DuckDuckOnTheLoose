@@ -362,8 +362,8 @@ function _init()
   if npc.cell==nil then
    npc.cell={flr(rnd(cells.bounds[1])),flr(rnd(cells.bounds[2]))}
   
-   npc.cell[1]=flr(rnd"6")
-   npc.cell[2]=flr(rnd"6")
+   -- put unset npcs in top-left
+   npc.cell={flr(rnd"6"),flr(rnd"6")}
   end
   
   npc.sfx=flr(rnd"2")+10
@@ -498,9 +498,10 @@ function init_cells()
      },
      leaves={{0,0},{0,0},{0,0}}
     }
-    t.p[1]=mid(t.girth,t.p[1],cells.w-t.girth)
-    t.p[2]=mid(t.girth,t.p[2],cells.h-t.girth)
-    
+    t.p={
+    mid(t.girth,t.p[1],cells.w-t.girth),
+    mid(t.girth,t.p[2],cells.h-t.girth)
+    }
     t.s=t.p
     add(c.trees,t)
    end
@@ -634,19 +635,16 @@ function _update()
  if btnp"4" then
   sfx(5,2)
   p.quack_timer=10
-  cam.p[1]-=cos(p.a)*2
-  cam.p[2]-=sin(p.a)*2
+  cam.p=v_add(cam.p,{cos(p.a)*-2,sin(p.a)*-2})
  elseif btnp"5" then
   sfx(6,2)
   p.quack_timer=10
-  cam.p[1]-=cos(p.a)*2
-  cam.p[2]-=sin(p.a)*2
+  cam.p=v_add(cam.p,{cos(p.a)*-2,sin(p.a)*-2})
  end
  
  p.quack_timer=max(0,p.quack_timer-1)
  
- perspective_offset[1]=64+sin(time()/9)*4
- perspective_offset[2]=80+sin(time()/11)*4
+ perspective_offset={64+sin(time()/9)*4,80+sin(time()/11)*4}
  
  
  if abs(v_dif[1])+abs(v_dif[2]) > 0.01 then
@@ -689,8 +687,10 @@ function _update()
  )
  cam.v=v_sub(cam.p,cam.p_o)
 
- cam.c[1]=cam.p[1]%cells.w
- cam.c[2]=cam.p[2]%cells.h
+ cam.c={
+ cam.p[1]%cells.w,
+ cam.p[2]%cells.h
+ }
 
  local cell={
  flr(cam.p[1]/cells.w),
@@ -804,9 +804,11 @@ function update_trees()
   
   t.s=v_add(t.p,t.s)
   
-  t.leaves[1]=v_lerp(t.p,t.s,0.5)
-  t.leaves[2]=v_lerp(t.p,t.s,0.75)
-  t.leaves[3]=t.s
+  t.leaves={
+  v_lerp(t.p,t.s,0.5),
+  v_lerp(t.p,t.s,0.75),
+  t.s
+  }
   
   add_blob(v_add({(cells.current[1]+x)*cells.w,(cells.current[2]+y)*cells.h},t.p), t.girth)
   
