@@ -273,13 +273,13 @@ function _init()
  	mouth=-1,mouth_offset=0,
  	c1=4,c2=3,r=3,height=2,
   cell={81,15},
- 	lines="duck duck! we need your help!|we lost our babies!!!!!|we had eight before, but now we only have one!|i don't know what happened to the rest!|i'm staying here to keep track of the last one.|please find the other seven!|we're counting on you\nduck duck!|"},
+ 	lines="duck duck! we need your help!|we lost our babies!!!!!|we had eight before, but now we only have one!|i don't know what happened to the rest!|i'm staying here to keep track of the last one.|please find the other seven!|we're counting on you\nduck duck!|...|if you don't know where to look...|try the city west of us.|"},
 
  	{who="hen",spr=0,
  	mouth=-1,mouth_offset=0,
  	c1=6,c2=4,r=3,height=2,
   cell={83,15},
- 	lines="duck duck! you need to find our babies!|we lost them!!!!!|one's here, but seven are out there all alone!|you've got to find them!|don't let us down duck duck!|"},
+ 	lines="duck duck! you need to find our babies!|we lost them!!!!!|one's here, but seven are out there all alone!|you've got to find them!|don't let us down duck duck!|...|i wonder if they went to the town east of our lake?|"},
 
  	{who="duckling",spr=2,
  	mouth=-1,mouth_offset=0,
