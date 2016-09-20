@@ -1,7 +1,6 @@
 pico-8 cartridge // http://www.pico-8.com
 version 8
 __lua__
---math
 function range(v)
  return rnd(max(0,v[2]-v[1]))+v[1]
 end
@@ -10,7 +9,6 @@ function lerp(from,to,t)
  return from+t*(to-from)
 end
 
--- cubic in-out
 function ease(t)
  if t >= 0.5 then
   return (t-1)*(2*t-2)*(2*t-2)+1
@@ -98,7 +96,6 @@ function _init()
  
  
  biomes={}
- --empty biomes
  for i=0,15 do
   add_biome(i,{0,0},{0,0,{}},false,{true,3})
  end
@@ -124,11 +121,11 @@ function _init()
  }
  
  clouds={}
- clouds_height_range={45,50}
- clouds_count_range={20,40}
- clouds_radius_range={5,15}
- clouds_cluster_range={5,7}
- clouds_size=256
+ c_height_range={45,50}
+ c_count_range={20,40}
+ c_radius_range={5,15}
+ c_cluster_range={5,7}
+ c_size=256
  
  bushes={}
  bushes_height_range={0.5,1.5}
@@ -142,7 +139,6 @@ function _init()
  buildings_h_range={8,min(cell_size,cell_size)-16}
  buildings_colours={8,9,6}
  
- --player
  p={
  p=v_mul({82,16},32),
  v={0,0},
@@ -169,31 +165,30 @@ function _init()
  found_timer=0
  }
  
- add(ducklings,{ -- forest clearing
+ add(ducklings,{
   p=v_add(v_mul({23,60},32),{rnd(cell_size),rnd(cell_size)})
  })
- add(ducklings,{ -- obblesville lake
+ add(ducklings,{
   p=v_add(v_mul({118,8},32),{rnd(cell_size),rnd(cell_size)})
  })
- add(ducklings,{ -- old poctridge crater
+ add(ducklings,{
   p=v_add(v_mul({26,105},32),{rnd(cell_size),rnd(cell_size)})
  })
- add(ducklings,{ -- spiral garden
+ add(ducklings,{
   p=v_add(v_mul({69,82},32),{rnd(cell_size),rnd(cell_size)})
  })
- add(ducklings,{ -- new poctridge
+ add(ducklings,{
   p=v_add(v_mul({118,105},32),{rnd(cell_size),rnd(cell_size)})
  })
- add(ducklings,{ -- ackelsby park
+ add(ducklings,{
   p=v_add(v_mul({32,19},32),{rnd(cell_size),rnd(cell_size)})
  })
- add(ducklings,{ -- mountain
+ add(ducklings,{
   p=v_add(v_mul({107,84},32),{rnd(cell_size),rnd(cell_size)})
  })
  
  p.r=4 
  p.r2=p.r*p.r
- -- camera
  cam={
  p=v_sub(p.p,{64,64+128}),
  c={0,0},
@@ -207,12 +202,6 @@ function _init()
   flr(cam.p[2]/cell_size)
  }
  
- 
- 
- 
- -- read compressed map->string
- -- each cell is 2 bytes
- -- format is rle [repeat,tile]
  mapdata_string=""
  for i=0x2000,0x2fff do
   local a=shr(band(peek(i),0xf0),4)
@@ -222,7 +211,6 @@ function _init()
   end
  end
  
- -- convert mapstring->2d array
  mapdata={}
  local x=cell_bounds-1
  local y=-1
@@ -243,8 +231,6 @@ function _init()
  end
  init_cells()
  
- 
- 
  footprints={
   {0,0},
   {0,0},
@@ -257,17 +243,13 @@ function _init()
   footprints[i+1]=footprints[2]
  end
  
- 
- 
- 
- -- clouds init
- for i=1,range(clouds_count_range) do
-  local x=rnd(clouds_size*2)
-  local y=rnd(clouds_size*2)
+ for i=1,range(c_count_range) do
+  local x=rnd(c_size*2)
+  local y=rnd(c_size*2)
   local r=0
-  for j=1,range(clouds_cluster_range) do
+  for j=1,range(c_cluster_range) do
    local c={
-    r=range(clouds_radius_range),
+    r=range(c_radius_range),
    }
    c.p={
     x+range({1,(c.r+r)/2})-range({1,(c.r+r)/2}),
@@ -279,17 +261,13 @@ function _init()
     y=c.p[2]
     r=c.r
    end
-   c.height=range(clouds_height_range)
+   c.height=range(c_height_range)
    c.s=c.p
    
    add(clouds,c)
   end
  end
  
- 
- 
- 
- -- npcs
  npcs={
  	{who="drake",spr=1,
  	mouth=-1,mouth_offset=0,
@@ -863,13 +841,13 @@ function _update()
  
  blobs={}
  
- update_trees()
- update_clouds()
- update_bushes()
- update_buildings()
- update_npcs()
- update_ducklings()
- update_collision()
+ u_trees()
+ u_clouds()
+ u_bushes()
+ u_buildings()
+ u_npcs()
+ u_ducklings()
+ u_collision()
  
  
  local pcell={
@@ -881,11 +859,11 @@ function _update()
  
  p.cell=cells.a[pcell[1]][pcell[2]]
 
- update_footprints()
- update_dialog()
+ u_footprints()
+ u_dialog()
 end
 
-function update_footprints()
+function u_footprints()
  if p.cell then
  if p.cell.biome.footprints then
   -- footprints
@@ -916,7 +894,7 @@ function update_footprints()
 end
 
 
-function update_collision()
+function u_collision()
  -- blobs
  for b in all(blobs) do
   local d=v_sub(p.p,b.p)
@@ -945,7 +923,7 @@ function update_collision()
  end
 end
 
-function update_trees()
+function u_trees()
  
  for x=0,cell_fill do
  for y=0,cell_fill do
@@ -977,20 +955,20 @@ function update_trees()
  end
 end
 
-function update_clouds()
+function u_clouds()
  for c in all(clouds) do
   c.p[1]+=0.1-cam.v[1]
   c.p[2]+=0.1-cam.v[2]
   
-  if c.p[1] > clouds_size+clouds_radius_range[2] then
-   c.p[1] -= clouds_size*2+clouds_radius_range[2]
-  elseif c.p[1] < -clouds_size-clouds_radius_range[2] then
-   c.p[1] += clouds_size*2+clouds_radius_range[2]
+  if c.p[1] > c_size+c_radius_range[2] then
+   c.p[1] -= c_size*2+c_radius_range[2]
+  elseif c.p[1] < -c_size-c_radius_range[2] then
+   c.p[1] += c_size*2+c_radius_range[2]
   end
-  if c.p[2] > clouds_size+clouds_radius_range[2] then
-   c.p[2] -= clouds_size*2+clouds_radius_range[2]
-  elseif c.p[2] < -clouds_size-clouds_radius_range[2] then
-   c.p[2] += clouds_size*2+clouds_radius_range[2]
+  if c.p[2] > c_size+c_radius_range[2] then
+   c.p[2] -= c_size*2+c_radius_range[2]
+  elseif c.p[2] < -c_size-c_radius_range[2] then
+   c.p[2] += c_size*2+c_radius_range[2]
   end
   
    
@@ -1003,7 +981,7 @@ function update_clouds()
  end
 end
 
-function update_bushes()
+function u_bushes()
  for x=0,cell_fill do
  for y=0,cell_fill do
  
@@ -1026,7 +1004,7 @@ function update_bushes()
 end
 
 
-function update_buildings()
+function u_buildings()
  for x=0,cell_fill do
  for y=0,cell_fill do
  
@@ -1075,7 +1053,7 @@ function update_buildings()
  end
 end
 
-function update_npcs()
+function u_npcs()
  for npc in all(npcs) do
   npc.p2={npc.cell[1],npc.cell[2]}
   
@@ -1096,7 +1074,7 @@ function update_npcs()
  end
 end
 
-function update_ducklings()
+function u_ducklings()
  -- pick em up
  for d in all(ducklings) do
   if v_distm(d.p,p.p) < p.r then
@@ -1141,7 +1119,7 @@ function update_ducklings()
  end
 end
 
-function update_dialog()
+function u_dialog()
  local prev=talk.npc
  -- find closest npc in range
  talk.r=10000
@@ -1230,43 +1208,43 @@ function update_dialog()
 end
 
 function _draw()
- draw_bg()
+ d_bg()
  
  camera(cam.p[1],cam.p[2])
  
- draw_footprints()
+ d_footprints()
  
- draw_bushes"1"
- draw_ducklings"1"
- draw_npcs"1"
- draw_player"1"
- draw_trees"1"
- draw_buildings"1"
- draw_clouds"1" 
+ d_bushes"1"
+ d_ducklings"1"
+ d_npcs"1"
+ d_player"1"
+ d_trees"1"
+ d_buildings"1"
+ d_clouds"1" 
  
- draw_bushes()
- draw_ducklings()
- draw_npcs()
- draw_player()
- draw_trees()
- draw_buildings()
- draw_clouds()
+ d_bushes()
+ d_ducklings()
+ d_npcs()
+ d_player()
+ d_trees()
+ d_buildings()
+ d_clouds()
  
  if ducklings.found_timer > 0 then
-  draw_found()
+  d_found()
  end
  
  if menu!=nil then
-  draw_menu()
+  d_menu()
  elseif talk.offset > -talk.offset_target then
   camera(0,talk.offset)
-  draw_duckface()
-  draw_npcface()
-  draw_dialog()
+  d_duckface()
+  d_npcface()
+  d_dialog()
  end
 end
 
-function draw_bg()
+function d_bg()
  camera(cam.p[1],cam.p[2])
  
  for a=0,cell_fill do
@@ -1319,7 +1297,7 @@ function draw_bg()
  
 end
 
-function draw_footprints()
+function d_footprints()
  color"5"
  for f=2,#footprints,2 do
   local f1=footprints[f-1]
@@ -1333,7 +1311,7 @@ function draw_footprints()
  end
 end
 
-function draw_ducklings(shadow)
+function d_ducklings(shadow)
  camera(cam.p[1],cam.p[2])
  
  if shadow then
@@ -1356,7 +1334,7 @@ function draw_ducklings(shadow)
  end
 end
 
-function draw_player(shadow)
+function d_player(shadow)
  camera(cam.p[1],cam.p[2])
  
  if shadow then
@@ -1381,7 +1359,7 @@ function draw_player(shadow)
   end
 end
 
-function draw_trees(shadows)
+function d_trees(shadows)
  for a=0,cell_fill do
  for b=0,cell_fill do
  
@@ -1427,7 +1405,7 @@ function draw_trees(shadows)
  end
 end
 
-function draw_buildings(shadows) 
+function d_buildings(shadows) 
  for x=0,cell_fill do
  for y=0,cell_fill do
  
@@ -1467,7 +1445,7 @@ function draw_buildings(shadows)
  end
 end
 
-function draw_clouds(shadows)
+function d_clouds(shadows)
  camera""
  if shadows then
   color"5"
@@ -1482,7 +1460,7 @@ function draw_clouds(shadows)
  end
 end
  
-function draw_bushes(shadows)
+function d_bushes(shadows)
  for a=0,cell_fill do
  for b=0,cell_fill do
  
@@ -1517,7 +1495,7 @@ function draw_bushes(shadows)
  end
 end
 
-function draw_npcs(shadows)
+function d_npcs(shadows)
  camera(cam.p[1],cam.p[2])
  
  if shadows then
@@ -1540,7 +1518,7 @@ function draw_npcs(shadows)
  end
 end
 
-function draw_title()
+function d_title()
  local t=time()
  local t2=t
  local c=2
@@ -1570,9 +1548,9 @@ function draw_title()
  pal(0,0)
 end
 
-function draw_menu()
+function d_menu()
  camera(0,menu)
- draw_title()
+ d_title()
  
  local a=-abs(sin(time()/2))*3
  a=flr(a)
@@ -1605,7 +1583,7 @@ function draw_menu()
  print_ol("• quack •",43,127-16,0,7)
 end
 
-function draw_duckface()
+function d_duckface()
  local t=p.quack_timer
  local a=abs(sin(t/40))*5-abs(sin(time()/2))*3
  a=flr(a)
@@ -1619,7 +1597,7 @@ function draw_duckface()
  sspr(sx,0,16,16,0,128-32-a,32,32+a)
 end
 
-function draw_npcface()
+function d_npcface()
  local a=abs(sin(talk.bounce/40))*5-abs(sin(time()/2))*3
  a=flr(a)sx=0
  sy=32
@@ -1643,14 +1621,14 @@ function draw_npcface()
  end
 end
 
-function draw_dialog()
+function d_dialog()
  local a=abs(sin(talk.bounce/40))*5-abs(sin(time()/2))*3
  a=flr(a)
  print_ol(talk.npc.who,127-#talk.npc.who*4-2,127-39-a,0,7)
  print_ol(talk.said,32,127-24,0,7)
 end
 
-function draw_found()
+function d_found()
  local c=ducklings.found_timer/160
  c=c*c*2
  c=-(-sin(c))*128+64
