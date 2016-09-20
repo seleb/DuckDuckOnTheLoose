@@ -1207,8 +1207,6 @@ function _draw()
  draw_buildings()
  draw_clouds()
  
- --draw_debug()
- 
  if ducklings.found_timer > 0 then
   draw_found()
  end
@@ -1501,76 +1499,6 @@ function draw_npcs(shadows)
   end
  end
 end
-
-function draw_debug()
- --cells
- camera(cam.p[1],cam.p[2])
- for x=cells.current[1],cells.current[1]+cell_fill do
- for y=cells.current[2],cells.current[2]+cell_fill do
- 
- local cell=cells.a[x-cells.current[1]][y-cells.current[2]]
- 
- if x==cells.current[1] and y==cells.current[2] then
-  color"10"
- elseif
-  x>=cell_bounds[1] or
-  y>=cell_bounds[2] or
-  x<=-1 or
-  y<=-1 then
-  color"8"
- else
-  color"6"
- end
- rect(
- x*cell_size+1,
- y*cell_size+1,
- (x+1)*cell_size-1,
- (y+1)*cell_size-1
- )
- print(x.." "..y,
- x*cell_size+3,
- y*cell_size+3)
- print("ts:"..#cell.trees,
- x*cell_size+3,
- y*cell_size+10)
- print("bs:"..#cell.bushes,
- x*cell_size+3,
- y*cell_size+17)
- end
- end
- 
- 
- for b in all(blobs) do
-  if b.hit then
-   color"8"
-  else
-   color"6"
-  end
-  circ(b.p[1],b.p[2],b.r)
- end
- 
- color"6"
- circ(p.p[1],p.p[2],p.r)
- line(p.p[1],p.p[2],
- p.p[1]+p.r*cos(p.a),
- p.p[2]+p.r*sin(p.a))
- 
- print_ol(p.cell.c,p.p[1]+3,p.p[2]+3,0,7)
- 
- 
- 
- camera""
- 
- print_ol("mem:"..stat(0)/1024,1,1,0,7)
- print_ol("cpu:"..stat(1),1,7,0,7)
- print_ol("pos:"..p.p[1].." "..p.p[2],1,22,0,7)
-
- --crosshair
- circ(64,64,1,0)
- 
- 
-end
-
 
 function draw_title()
  local t=time()
