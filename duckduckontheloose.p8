@@ -309,9 +309,11 @@ function _init()
   cell={81,16},
  	lines="hi duck duck!|are you going to find my brothers and sisters?|they're hiding somewhere around here...|i'll let you know if i see them!|good luck duck duck!|"},
 
- 	{who="trucker",spr=15,
- 	mouth=10,mouth_offset=-4,
- 	c1=0,c2=11,r=4,height=4},
+ 	{who="chevy",spr=15,
+ 	mouth=0,mouth_offset=0,
+ 	c1=3,c2=8,r=5,height=4,
+  cell={53,52},
+  lines="oi, duck duck.|you seen tom?|i caught the rascal sneaking through winter supplies.|i chased him out of town...|but lost him when he cut through the river.|make sure to let me know if you see him, you hear?|...|he'll have to come back at some point...|"},
 
  	{who="spooky ghost",spr=14,
  	mouth=7,mouth_offset=0,
@@ -335,7 +337,7 @@ function _init()
  	mouth=0,mouth_offset=0,
  	c1=1,c2=15,r=4,height=4,
   cell={58,58},
-  lines="duck duck, buddy!|how's it going?|on an adventure, i see!|i know how that goes...|but that life's not for ol' tommy!|leave the adventurin' to the birds, i always say!|speaking of birds...|what's up with those ducklings?|i saw one headed out west earlier...|course i didn't follow!|birds know best, as i always say!|or is it \"birds know west\"?|...|well, i'll let you get back to it...|best o' luck duck duck!|"},
+  lines="duck duck, buddy!|how's it going?|on a noble adventure, i see!|i know how that goes...|but that life's not for your ol' pal tommy!|leave the adventurin' to the birds, i always say!|speaking of birds...|what's up with those ducklings?|i saw one headed out west earlier...|course i didn't follow!|birds know best, as i always say!|or is it \"birds know west\"?|...|well, i'll let you get back to it...|best o' luck duck duck!|"},
 
  	{who="swimmer",spr=10,
  	mouth=0,mouth_offset=-4,
@@ -404,16 +406,64 @@ function _init()
   lines="wow duck duck!|you climbed this mountain too?|impressive!|isn't it great here? we're so far up!|so far away from everything...|it was quite a hike!|one slip and that would've been it for me!|...|i hope we'll have a safe trip back to base camp.|wouldn't want them to send a rescue team after us!|...|*sigh*|i know, duck duck.|i know it's all flat.|but... let me have this moment, okay?|...|thanks duck duck.|...|...|i think i can see my house from here!|"},
 
  {who="chateau",spr=18,
-  mouth=0,mouth_offset=0,
+  mouth=7,mouth_offset=2,
   c1=0,c2=0,r=3,height=2,
   cell={37,32},
   lines="bonjour duck duck!|comment ca va?|bien? bien!|"},
+
+ {who="chatelain",spr=17,
+  mouth=0,mouth_offset=2,
+  c1=10,c2=9,r=3,height=2,
+  cell={115,42},
+  lines="salut duck duck!|voulez-vous l'aide?|non?|d'accord, je reste ici!|me parler encore si tu besoin d'aide.|...|voux parlez francais, oui?|"},
 
  {who="maximillian",spr=19,
   mouth=0,mouth_offset=0,
   c1=0,c2=15,r=4,height=4,
   cell={54,32},
   lines="welcome back duck duck!|i hope things are going well for you.|things here are better than ever!|don't you worry about us.|surely you've got other things to do anyway.|oh!|ducklings!!|we had some duckling guests earlier!|i think one of them is still here...|a couple left to the south a little while ago.|you should probably go check that out.|...|yep, definitely don't need help here right now.|"},
+
+ {who="poctling",spr=20,
+  mouth=0,mouth_offset=2,
+  c1=0,c2=13,r=4,height=3,
+  cell={83,110},
+  lines="duck duck.|you were not expected, duck duck.|"},
+
+ {who="poctling",spr=21,
+  mouth=0,mouth_offset=0,
+  c1=0,c2=13,r=4,height=3,
+  cell={96,107},
+  lines="duck duck.|you were not invited, duck duck.|"},
+
+ {who="poctling",spr=22,
+  mouth=0,mouth_offset=0,
+  c1=0,c2=13,r=4,height=4,
+  cell={95,113},
+  lines="duck duck.|you were not allowed, duck duck.|"},
+
+ {who="poctling",spr=23,
+  mouth=0,mouth_offset=0,
+  c1=0,c2=13,r=4,height=4,
+  cell={102,109},
+  lines="duck duck.|you are trespassing, duck duck.|"},
+
+ {who="poctling",spr=22,
+  mouth=0,mouth_offset=0,
+  c1=0,c2=13,r=4,height=4,
+  cell={108,107},
+  lines="duck duck.|you are intruding, duck duck.|"},
+
+ {who="poctling",spr=21,
+  mouth=0,mouth_offset=0,
+  c1=0,c2=13,r=4,height=3,
+  cell={112,114},
+  lines="duck duck.|you are violating, duck duck.|"},
+
+ {who="poctling",spr=20,
+  mouth=0,mouth_offset=2,
+  c1=0,c2=13,r=4,height=3,
+  cell={118,110},
+  lines="duck duck.|this place is not for you, duck duck.|this place is not for your younglings, duck duck.|collect them, duck duck.|collect them and leave, duck duck.|"},
 
  {who="worker",spr=31,
   mouth=-1,mouth_offset=0,
@@ -1214,11 +1264,6 @@ function _draw()
   draw_npcface()
   draw_dialog()
  end
- 
- 
- camera(0,0)
- print_ol(flr(p.p[1]/cell_size).."\n"..flr(p.p[2]/cell_size),10,10,0,7)
-
 end
 
 function draw_bg()
@@ -1696,20 +1741,20 @@ e777474666664444eeee7ffaf9fff7eeee77998888889977eeee71111f111f11eeeee7dddddd7eee
 e744474666664444eeee7749999477eeee7cccccccccccc7eeee71111111ff11eeeee7dddddd7eeeeeeee7aaaaaa7eeeeeeee7eeeeee7eeeee7ff3333333ff7e
 eeeee77777777eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee7777777777eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee7777777777ee
 eeeee711111877eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee7000000007eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee7777ee77777eeeee70000000077e
-eeee771c1c18877eeeeeee777eee777eeeeeee777eee777eeeee7000000007eeeeeeeeeeeeeeeeeeeeeee77777777eeeeee7700777700077eeee70000000007e
-eeee71818181887eeeeeee797777797eeeeeee707777707eee77788888888777eeeee77777777eeeeeee7700000077eeeee7000000000007eeee70000000007e
-eeee78888888187eeeeeee799777997eeeeeee700777007eee700afffffaa007eeee7700000077eeeeee700dddd007eeeee7000dddd00007eeee70ddddd0007e
-eeee7ff0f0ff817eeeeeee7999999a7eeeeeee700000067eee777ff0f0ffa777eeee700dddd0077eeeee70dadadd07eeeee770dadadd0077eeee7ddadadd007e
-eeee7ff0f0fff87eeeeeee7999999a7eeeeeee700000067eeeee7ff0f0fff7eeeeee70dadadd007eeeee7dddddddd7eeeeee7dddddddd77eeeee7ddddddd007e
-ee777ff0f0ffff7eeeeeee790909997eeeeeee709090007eeeee7ff0f0fff77eeeee7dddddddd07eeeee7ddadaddd77eeeee7ddadadddd7eeeee7ddadadd0d7e
-ee717ffffffff17eeeeee7790909997eeeeee7709090007eeeee7fffffffff7eeeee7ddadaddd07eeeee7ddddddddd7eeeee7ddddddddd7eeeee7ddddddddd7e
-ee717fffff0ff17eeeeee7009999997eeeeee7000000007ee7777fffff0fff7eeeee7ddddddddd7eeeee7ddddddddd7eeeee7dd000ddd07eeeee7dd000ddd07e
-ee717ff000fff17eeeeee7999999997eeeeee7000000007ee7ff7ff000fff77eeeee7ddddddddd7eeeee7dd000ddd77eeeee7dddddddd77eeeee7dddddddd77e
-ee7174ffffff417eeeeee79900099977eeeee70077700077e7ff7ffffffff7eeeeee7dd000ddd07eeeee77dddddd77eeeeee777dddd777eeeeee777dddd777ee
-e77174444444717eee77777999999997ee77777000000007e700777ffff777eeeeee70dddddd007eeeeee77dddd77eeeeeeee700dd007eeeeeee7700dd0077ee
-e788774444478877ee79977799999999ee70077700000000e7000000ff007eeeeeee777dddd7777eeeeee700dd007eeeeeee7700000077eeeeee7000000007ee
-e788771441178817ee7799799aaaa999ee77007000000000e700000088007eeeeeeee700dd007eeeeeeee70000007eeeeee770000000077eeeee7000000007ee
-e771111111177117eee77979aaaaaa99eee7707000000000e777770066007eeeeeeee70000007eeeeeeee70000007eeeeee700000000007eeeee7000000007ee
+eeee771c1c18877eeeeee777eee777eeeeeee777eee777eeeeee7000000007eeeeeeeeeeeeeeeeeeeeeee77777777eeeeee7700777700077eeee70000000007e
+eeee71818181887eeeeee797777797eeeeeee707777707eeee77788888888777eeeee77777777eeeeeee7700000077eeeee7000000000007eeee70000000007e
+eeee78888888187eeeeee799777997eeeeeee700777007eeee700afffffaa007eeee7700000077eeeeee700dddd007eeeee7000dddd00007eeee70ddddd0007e
+eeee7ff0f0ff817eeeeee7999999a7eeeeeee700000067eeee777ff0f0ffa777eeee700dddd0077eeeee70dadadd07eeeee770dadadd0077eeee7ddadadd007e
+eeee7ff0f0fff87eeeeee7999999a7eeeeeee700000067eeeeee7ff0f0fff7eeeeee70dadadd007eeeee7dddddddd7eeeeee7dddddddd77eeeee7ddddddd007e
+ee777ff0f0ffff7eeeeee790909997eeeeeee709090007eeeeee7ff0f0fff77eeeee7dddddddd07eeeee7ddadaddd77eeeee7ddadadddd7eeeee7ddadadd0d7e
+ee717ffffffff17eeeee7790909997eeeeee7709090007eeeeee7fffffffff7eeeee7ddadaddd07eeeee7ddddddddd7eeeee7ddddddddd7eeeee7ddddddddd7e
+ee717fffff0ff17eeeee7009999997eeeeee7000000007eee7777fffff0fff7eeeee7ddddddddd7eeeee7ddddddddd7eeeee7dd000ddd07eeeee7dd000ddd07e
+ee717ff000fff17eeeee7999999997eeeeee7000000007eee7ff7ff000fff77eeeee7ddddddddd7eeeee7dd000ddd77eeeee7dddddddd77eeeee7dddddddd77e
+ee7174ffffff417eeeee79900099977eeeee70077700077ee7ff7ffffffff7eeeeee7dd000ddd07eeeee77dddddd77eeeeee777dddd777eeeeee777dddd777ee
+e77174444444717ee777779999999977e777770000000077e700777ffff777eeeeee70dddddd007eeeeee77dddd77eeeeeeee700dd007eeeeeee7700dd0077ee
+e788774444478877e799777999999997e700777000000007e7000000ff007eeeeeee777dddd7777eeeeee700dd007eeeeeee7700000077eeeeee7000000007ee
+e788771441178817e7799799aaaa9999e770070000000000e700000088007eeeeeeee700dd007eeeeeeee70000007eeeeee770000000077eeeee7000000007ee
+e771111111177117ee77979aaaaaa999ee77070000000000e777770066007eeeeeeee70000007eeeeeeee70000007eeeeee700000000007eeeee7000000007ee
 eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee77777eeeeeeeeeeeeeeeeeeeee
 eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee777777777eeeeeeeeeeeeeeeeeeeeeee77979777eeeeeeeeeeeeeeeeeee
 ee777777777777eeeeeee77777777eeeeeeee77777777eeeeeeeeeeeeeeeeeeeeeee77444444477eeeeee77777777eeeeeee77a9a9a977eeeeeee77777777eee
