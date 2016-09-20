@@ -1550,8 +1550,8 @@ function d_title()
  local s=" on the"
  for i=1,#s do
   pal(0,(i+t2)%c+c)
-  print_ol(sub(s,i,i),64+(i-1)*4-#s*2+2,35+sin(t/2+i/#s)+2,5,5)
-  print_ol(sub(s,i,i),64+(i-1)*4-#s*2,35+sin(t/2+i/#s),7,0)
+  print_ol(sub(s,i,i),64+(i-1)*4-#s*2+2,35+sin(t/2+i/#s)+2.1,5,5)
+  print_ol(sub(s,i,i),64+(i-1)*4-#s*2,35+sin(t/2+i/#s)+0.1,7,0)
  end
  
  for i=0,4 do
