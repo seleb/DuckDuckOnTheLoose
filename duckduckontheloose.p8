@@ -462,7 +462,7 @@ function _init()
   lines="have you seen this garden maze duck duck?|i thought it'd be fun to explore...|but you can just walk between the trees!|it's kind of lame, honestly.|major let-down. a 6/10 at best.|you can quote me on that.|looks like that feathery kid had fun at least.|so not a total waste of space.|...|i wonder who organized this thing...|"},
 
  {who="curious child",spr=27,
-  mouth=0,mouth_offset=0,
+  mouth=0,mouth_offset=2,
   c1=3,c2=4,r=3,height=2,
   cell={106,6},
   lines="um, you're duck duck, right?|my dad said i'm not supposed to talk to strangers...|especially ones from out of town...|but can i ask you something?|um...|do i reaaalllly need to go to bed when the sun goes down?|cause sometimes, i'm just not tired!|...|i think my dad's a liar.|"},
