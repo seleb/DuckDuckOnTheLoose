@@ -1623,7 +1623,6 @@ function d_npcface()
  
  sspr(sx,sy,16,16,128-32,128-32-a,32,32+a)
  
- -- npc mouth
  if npc.mouth >= 0 then
   local c=sub(talk.say,1,1)
   if c!="|" and c!="" and time()%0.2 > 0.1 then
