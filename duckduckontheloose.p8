@@ -1,6 +1,9 @@
 pico-8 cartridge // http://www.pico-8.com
 version 8
 __lua__
+--duck duck on the loose
+--sean s leblanc
+
 function range(v)
  return rnd(max(0,v[2]-v[1]))+v[1]
 end
