@@ -345,7 +345,7 @@ function _init()
   mouth=0,mouth_offset=0,
   c1=4,c2=4,r=3,height=2,
   cell={24,62},
-  lines="hey duck duck.|sorry about the others.|they take the \"peaceful clearing\" very seriously.|you don't really need to worry.|they're too lazy to kick you out themselves.|but you should probably head out anyway.|talk to you later duck duck."},
+  lines="hey duck duck.|sorry about the others.|they take the \"peaceful clearing\" very seriously.|you don't really need to worry.|they're too lazy to kick you out themselves.|but you should probably head out anyway.|talk to you later duck duck.|"},
 
  	{who="pen",spr=7,
  	mouth=0,mouth_offset=0,
