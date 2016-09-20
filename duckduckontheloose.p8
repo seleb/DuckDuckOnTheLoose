@@ -146,8 +146,8 @@ function _init()
  p={
  p=v_mul({82,16},32),
  v={0,0},
- speed={2.7,2.7},
- max_speed=10,
+ speed={0.7,0.7},
+ max_speed=3,
  cur_speed=0,
  damping=0.8,
  a=0.75,
