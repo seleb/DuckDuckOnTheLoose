@@ -92,7 +92,7 @@ function _init()
  
  cell_size=32
  cells={}
- cell_bounds={128,128}
+ cell_bounds=128
  cell_bound_str=2
  cell_fill=flr(128/cell_size+0.5)
  
@@ -123,29 +123,24 @@ function _init()
  gap=16
  }
  
- clouds={
- a={},
- height_range={45,50},
- count_range={20,40},
- radius_range={5,15},
- cluster_range={5,7},
- w=256,
- h=256
- }
+ clouds={}
+ clouds_height_range={45,50}
+ clouds_count_range={20,40}
+ clouds_radius_range={5,15}
+ clouds_cluster_range={5,7}
+ clouds_size=256
  
- bushes={
- height_range={0.5,1.5},
- count_range={10,30},
- radius_range={1,2.5},
- cluster_range={2,4}
- }
+ bushes={}
+ bushes_height_range={0.5,1.5}
+ bushes_count_range={10,30}
+ bushes_radius_range={1,2.5}
+ bushes_cluster_range={2,4}
  
- buildings={
- height_range={10,35},
- w_range={8,min(cell_size,cell_size)-16},
- h_range={8,min(cell_size,cell_size)-16},
- colours={8,9,6}
- }
+ buildings={}
+ buildings_height_range={10,35}
+ buildings_w_range={8,min(cell_size,cell_size)-16}
+ buildings_h_range={8,min(cell_size,cell_size)-16}
+ buildings_colours={8,9,6}
  
  --player
  p={
@@ -229,14 +224,14 @@ function _init()
  
  -- convert mapstring->2d array
  mapdata={}
- local x=cell_bounds[1]-1
+ local x=cell_bounds-1
  local y=-1
  while #mapdata_string > 0 do
   x+=1
-  if x==cell_bounds[1] then
+  if x==cell_bounds then
    x=0
    y+=1
-   if y==cell_bounds[2] then
+   if y==cell_bounds then
     break
    end
    mapdata[y]={}
@@ -266,13 +261,13 @@ function _init()
  
  
  -- clouds init
- for i=1,range(clouds.count_range) do
-  local x=rnd(clouds.w*2)
-  local y=rnd(clouds.h*2)
+ for i=1,range(clouds_count_range) do
+  local x=rnd(clouds_size*2)
+  local y=rnd(clouds_size*2)
   local r=0
-  for j=1,range(clouds.cluster_range) do
+  for j=1,range(clouds_cluster_range) do
    local c={
-    r=range(clouds.radius_range),
+    r=range(clouds_radius_range),
    }
    c.p={
     x+range({1,(c.r+r)/2})-range({1,(c.r+r)/2}),
@@ -284,10 +279,10 @@ function _init()
     y=c.p[2]
     r=c.r
    end
-   c.height=range(clouds.height_range)
+   c.height=range(clouds_height_range)
    c.s=c.p
    
-   add(clouds.a,c)
+   add(clouds,c)
   end
  end
  
@@ -474,7 +469,7 @@ function _init()
   npc.r2=npc.r*npc.r
   
   if npc.cell==nil then
-   npc.cell={flr(rnd(cell_bounds[1])),flr(rnd(cell_bounds[2]))}
+   npc.cell={flr(rnd(cell_bounds)),flr(rnd(cell_bounds))}
   
    -- put unset npcs in top-left
    npc.cell={flr(rnd"6"),flr(rnd"6")}
@@ -548,10 +543,10 @@ function init_cells()
  local y=b+cells.current[2]
  
  -- seed the rng based on cell position
- c.seed=seed+x*(cell_bounds[1]*2)+y
+ c.seed=seed+x*(cell_bounds*2)+y
  srand(c.seed)
  
- if x<0 or x>cell_bounds[1]-1 or y<0 or y>cell_bounds[2]-1 then
+ if x<0 or x>cell_bounds-1 or y<0 or y>cell_bounds-1 then
   c.c=1
  else
   c.c=mapdata[y][x]
@@ -563,7 +558,7 @@ function init_cells()
  for u=-1,1 do
   c.edges[u]={}
  for v=-1,1 do
-  if x+u<0 or x+u>cell_bounds[1]-1 or y+v<0 or y+v>cell_bounds[2]-1 then
+  if x+u<0 or x+u>cell_bounds-1 or y+v<0 or y+v>cell_bounds-1 then
    c.edges[u][v]=1
   else
    c.edges[u][v]=mapdata[y+v][x+u]
@@ -629,9 +624,9 @@ function init_cells()
    local r=0
    local bloom_colours=c.biome.bush_props[3]
    local colour=bloom_colours[flr(rnd(#bloom_colours))%#bloom_colours+1]
-   for j=1,range(bushes.cluster_range) do
+   for j=1,range(bushes_cluster_range) do
     local b={
-     r=range(bushes.radius_range)
+     r=range(bushes_radius_range)
     }
     b.p={
      x+range({1,(b.r+r)})-range({1,(b.r+r)/2}),
@@ -642,7 +637,7 @@ function init_cells()
      y=b.p[2]
      r=b.r
     end
-    b.height=range(bushes.height_range)
+    b.height=range(bushes_height_range)
     b.c=colour
     
     if rnd() < c.biome.bush_props[2] then
@@ -671,12 +666,12 @@ function init_cells()
   then
    c.building={
     size={
-     range(buildings.w_range),
-     range(buildings.h_range)
+     range(buildings_w_range),
+     range(buildings_h_range)
     },
     p={cell_size/2,cell_size/2},
-    height=range(buildings.height_range),
-    c=buildings.colours[flr(rnd(16))%#buildings.colours+1]
+    height=range(buildings_height_range),
+    c=buildings_colours[flr(rnd(16))%#buildings_colours+1]
    }
    c.building.s=v_sub(c.building.p,p.p)
   end
@@ -887,14 +882,14 @@ function update_collision()
  -- boundaries
  local x=p.p[1]/cell_size
  local y=p.p[2]/cell_size
- if x > cell_bounds[1] then
-  p.v[1] -= (x-cell_bounds[1])*cell_bound_str
+ if x > cell_bounds then
+  p.v[1] -= (x-cell_bounds)*cell_bound_str
  elseif x < 0 then
   p.v[1] -= x*cell_bound_str
  end
  
- if y > cell_bounds[2] then
-  p.v[2] -= (y-cell_bounds[2])*cell_bound_str
+ if y > cell_bounds then
+  p.v[2] -= (y-cell_bounds)*cell_bound_str
  elseif y < 0 then
   p.v[2] -= y*cell_bound_str
  end
@@ -933,19 +928,19 @@ function update_trees()
 end
 
 function update_clouds()
- for c in all(clouds.a) do
+ for c in all(clouds) do
   c.p[1]+=0.1-cam.v[1]
   c.p[2]+=0.1-cam.v[2]
   
-  if c.p[1] > clouds.w+clouds.radius_range[2] then
-   c.p[1] -= clouds.w*2+clouds.radius_range[2]
-  elseif c.p[1] < -clouds.w-clouds.radius_range[2] then
-   c.p[1] += clouds.w*2+clouds.radius_range[2]
+  if c.p[1] > clouds_size+clouds_radius_range[2] then
+   c.p[1] -= clouds_size*2+clouds_radius_range[2]
+  elseif c.p[1] < -clouds_size-clouds_radius_range[2] then
+   c.p[1] += clouds_size*2+clouds_radius_range[2]
   end
-  if c.p[2] > clouds.h+clouds.radius_range[2] then
-   c.p[2] -= clouds.h*2+clouds.radius_range[2]
-  elseif c.p[2] < -clouds.h-clouds.radius_range[2] then
-   c.p[2] += clouds.h*2+clouds.radius_range[2]
+  if c.p[2] > clouds_size+clouds_radius_range[2] then
+   c.p[2] -= clouds_size*2+clouds_radius_range[2]
+  elseif c.p[2] < -clouds_size-clouds_radius_range[2] then
+   c.p[2] += clouds_size*2+clouds_radius_range[2]
   end
   
    
@@ -1431,12 +1426,12 @@ function draw_clouds(shadows)
  camera""
  if shadows then
   color"5"
-  for c in all(clouds.a) do
+  for c in all(clouds) do
    circfill(c.ps[1],c.ps[2],c.r)
   end
  else
   color"7"
-  for c in all(clouds.a) do
+  for c in all(clouds) do
    circfill(c.s[1],c.s[2],c.r)
   end
  end
