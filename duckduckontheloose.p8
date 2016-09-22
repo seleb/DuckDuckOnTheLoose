@@ -1570,7 +1570,6 @@ function d_menu()
  local a=-abs(sin(time()/2))*3
  a=flr(a)
  
- -- drake
  sx=64
  if p.duck==4 then
   sx+=16
@@ -1578,13 +1577,11 @@ function d_menu()
  sspr(sx,0,16,16,0,128-32-a,32,32+a)
  sx=96
  
- -- hen
  if p.duck==5 then
   sx+=16
  end
  sspr(sx,0,16,16,128-32,128-32-a,32,32+a,true)
 
- -- quack text
  if p.duck==4 then
   print_ol("",33,127-16,7,0)
  else
@@ -1622,9 +1619,7 @@ function d_npcface()
   sx-=128
   sy+=16
  end
- 
  sspr(sx,sy,16,16,128-32,128-32-a,32,32+a)
- 
  if npc.mouth >= 0 then
   local c=sub(talk.say,1,1)
   if c!="|" and c!="" and time()%0.2 > 0.1 then
