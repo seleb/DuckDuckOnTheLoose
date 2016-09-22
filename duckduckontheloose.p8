@@ -583,6 +583,7 @@ function init_cells()
  else
   c.c=mapdata[y][x]
  end
+ c.c=c.c or 1
  c.biome=biomes[c.c]
  
  -- get colours for edge transition
@@ -598,6 +599,7 @@ function init_cells()
   if c.edges[u][v]==14 then
    c.edges[u][v]=3
   end
+  c.edges[u][v]=c.edges[u][v] or 1
   
  end
  end
